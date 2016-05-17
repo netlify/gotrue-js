@@ -21,6 +21,14 @@ export default class Authlify {
     });
   }
 
+  login(email, password) {
+    return this.api.request('/token', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `grant_type=password&username=${email}&password=${password}`
+    }).then((response) => new User(this.api, response).reload());
+  }
+
   confirm(token) {
     return this.verify('signup', token);
   }
@@ -36,14 +44,14 @@ export default class Authlify {
     return this.verify('recovery', token);
   }
 
+  user(tokenResponse) {
+    return new User(this.api, tokenResponse);
+  }
+
   verify(type, token) {
     return this.api.request('/verify', {
       method: 'POST',
       body: JSON.stringify({token, type})
-    }).then((response) => {
-      const user = new User(this.api, response);
-      user.reload();
-      return user;
-    });
+    }).then((response) => new User(this.api, response).reload());
   }
 }

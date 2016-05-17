@@ -2,7 +2,6 @@ const ExpiryMargin = 60 * 1000;
 
 export default class User {
   constructor(api, tokenResponse) {
-    const now = new Date();
     this.api = api;
     this.processTokenResponse(tokenResponse);
   }
@@ -27,10 +26,10 @@ export default class User {
         body: `grant_type=refresh_token&refresh_token=${this.refreshToken}`
       }).then((response) => {
         this.processTokenResponse(response);
-        return this.jwt;
+        return this.jwt_token;
       });
     }
-    return Promise.resolve(this.jwt);
+    return Promise.resolve(this.jwt_token);
   }
 
   logout() {
@@ -45,7 +44,7 @@ export default class User {
   }
 
   reload() {
-    this.request('/user').then((response) => {
+    return this.request('/user').then((response) => {
       for (var key in response) {
         this[key] = response[key];
       }
@@ -54,8 +53,11 @@ export default class User {
   }
 
   processTokenResponse(tokenResponse) {
+    const now = new Date();
+    this.tokenResponse = tokenResponse;
     this.refreshToken = tokenResponse.refresh_token;
-    this.jwt = tokenResponse.access_token;
-    this.jwt_expiry = now.setTime(now.getTime() + (tokenResponse.expires_in * 1000)).getTime();
+    this.jwt_token = tokenResponse.access_token;
+    now.setTime(now.getTime() + (tokenResponse.expires_in * 1000));
+    this.jwt_expiry = now.getTime();
   }
 }
