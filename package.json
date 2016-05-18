@@ -1,6 +1,6 @@
 {
   "name": "authlify-js",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Authlify API client for JavaScript",
   "main": "lib/index.js",
   "scripts": {

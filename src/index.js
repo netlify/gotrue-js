@@ -14,10 +14,10 @@ export default class Authlify {
     this.api = new API(options.APIUrl);
   }
 
-  signup(email, password) {
+  signup(email, password, data) {
     return this.api.request('/signup', {
       method: 'POST',
-      body: JSON.stringify({email, password})
+      body: JSON.stringify({email, password, data})
     });
   }
 
@@ -25,7 +25,7 @@ export default class Authlify {
     return this.api.request('/token', {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `grant_type=password&username=${email}&password=${password}`
+      body: `grant_type=password&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
     }).then((response) => new User(this.api, response).reload());
   }
 
