@@ -19,7 +19,7 @@ export default class User {
   }
 
   jwt() {
-    if (this.jwt_expiry + ExpiryMargin > new Date().getTime()) {
+    if (this.jwt_expiry - ExpiryMargin < new Date().getTime()) {
       return this.api.request('/token', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
