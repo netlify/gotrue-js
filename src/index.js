@@ -55,3 +55,7 @@ export default class Authlify {
     }).then((response) => new User(this.api, response).reload());
   }
 }
+
+if (typeof window !== "undefined") {
+  window.Authlify = Authlify
+}
