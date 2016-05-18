@@ -7,7 +7,7 @@ export default class User {
   }
 
   update(attributes) {
-    this.request('/user', {
+    return this.request('/user', {
       method: 'PUT',
       body: JSON.stringify(attributes)
     }).then((response) => {
