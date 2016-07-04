@@ -2,6 +2,7 @@ import API from './api';
 import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
+const storageKey = "authlify.user";
 
 export default class Authlify {
   constructor(options = {}) {
@@ -42,6 +43,20 @@ export default class Authlify {
 
   recover(token) {
     return this.verify('recovery', token);
+  }
+
+  persistSession(user) {
+    localStorage.setItem(storageKey, JSON.stringify(user));
+  }
+
+  recoverSession() {
+    const json = localStorage.getItem(storageKey);
+    if (json) {
+      const data = JSON.parse(json);
+      return this.user(data.tokenResponse).process(data);
+    }
+
+    return null;
   }
 
   user(tokenResponse) {

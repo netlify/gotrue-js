@@ -1,3 +1,4 @@
+
 const ExpiryMargin = 60 * 1000;
 
 export default class User {
@@ -44,12 +45,14 @@ export default class User {
   }
 
   reload() {
-    return this.request('/user').then((response) => {
-      for (var key in response) {
-        this[key] = response[key];
-      }
-      return this;
-    });
+    return this.request('/user').then(this.process.bind(this));
+  }
+
+  process(attributes) {
+    for (var key in attributes) {
+      this[key] = attributes[key];
+    }
+    return this;
   }
 
   processTokenResponse(tokenResponse) {

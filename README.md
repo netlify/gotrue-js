@@ -24,6 +24,11 @@ authlify.confirm(token).then(
   (error) => console.log("Failed to log in: %o", error)
 );
 
+authlify.login(email, password).then(
+  (user) => console.log("Logged in as %s", user.email),
+  (error) => console.log("Failed to log in: %o", error);
+)
+
 authlify.requestPasswordRecovery(email).then(
   (response) => console.log("Recovery email sent"),
   (error) => console.log("Error sending recovery mail: %o", error)
