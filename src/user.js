@@ -50,6 +50,7 @@ export default class User {
 
   process(attributes) {
     for (var key in attributes) {
+      if (key in this.prototype) { continue; }
       this[key] = attributes[key];
     }
     return this;
