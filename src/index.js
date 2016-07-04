@@ -46,7 +46,12 @@ export default class Authlify {
   }
 
   persistSession(user) {
-    localStorage.setItem(storageKey, JSON.stringify(user));
+    if (user) {
+      localStorage.setItem(storageKey, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(storageKey);
+    }
+
   }
 
   recoverSession() {
