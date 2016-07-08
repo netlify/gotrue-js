@@ -2,7 +2,6 @@ import API from './api';
 import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
-const storageKey = "authlify.user";
 
 export default class Authlify {
   constructor(options = {}) {
@@ -22,12 +21,19 @@ export default class Authlify {
     });
   }
 
-  login(email, password) {
+  login(email, password, remember) {
     return this.api.request('/token', {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: `grant_type=password&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
-    }).then((response) => new User(this.api, response).reload());
+    })
+      .then((response) => new User(this.api, response).reload())
+      .then((user) => {
+        if (remember) {
+          this.persistSession(user);
+        }
+        return user;
+      });
   }
 
   confirm(token) {
@@ -45,27 +51,12 @@ export default class Authlify {
     return this.verify('recovery', token);
   }
 
-  persistSession(user) {
-    if (user) {
-      localStorage.setItem(storageKey, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(storageKey);
-    }
-
-  }
-
-  recoverSession() {
-    const json = localStorage.getItem(storageKey);
-    if (json) {
-      const data = JSON.parse(json);
-      return this.user(data.tokenResponse).process(data);
-    }
-
-    return null;
-  }
-
   user(tokenResponse) {
     return new User(this.api, tokenResponse);
+  }
+
+  currentUser() {
+    return User.recoverSession();
   }
 
   verify(type, token) {

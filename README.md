@@ -39,6 +39,8 @@ authlify.recover(token).then(
   (error) => console.log("Failed to verify recover token: %o", error)
 );
 
+const user = authlify.currentUser()
+
 user.update({email: newEmail, password: newPassword}).then(
   (user) => console.log("Updated user"),
   (error) => console.log("Failed to update user: %o", error)
