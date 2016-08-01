@@ -50,7 +50,9 @@ export default class User {
   }
 
   logout() {
-    return this.request('/logout', {method: 'POST'}).then(this.clearSession.bind(this));
+    return this.request('/logout', {method: 'POST'})
+      .then(this.clearSession.bind(this))
+      .catch(this.clearSession.bind(this));
   }
 
   request(path, options) {
