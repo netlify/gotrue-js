@@ -30,7 +30,7 @@ export default class Authlify {
       .then((response) => new User(this.api, response).reload())
       .then((user) => {
         if (remember) {
-          this.persistSession(user);
+          user.persistSession(user);
         }
         return user;
       });
