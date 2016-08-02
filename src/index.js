@@ -8,7 +8,7 @@ export default class Authlify {
     if (!options.APIUrl) {
       throw("You must specify an APIUrl of your Authlify instance");
     }
-    if (!options.APIUrl.match(HTTPRegexp)) {
+    if (options.APIUrl.match(HTTPRegexp)) {
       console.log('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR AUTHLIFY EVER!\nAuthlify REQUIRES HTTPS to work securely.')
     }
     this.api = new API(options.APIUrl);
