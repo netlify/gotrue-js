@@ -1,6 +1,6 @@
-# Authlify JS Client
+# Netlify Auth JS Client
 
-This is a JS library for the [Authlify](https://github.com/netlify/authlify) API.
+This is a JS library for [Netlify Auth](https://github.com/netlify/netlify-auth) API.
 
 It lets you signup and authenticate users and is a building block for constructing
 the UI for signups, password recovery, login and logout.
@@ -8,38 +8,38 @@ the UI for signups, password recovery, login and logout.
 ## Usage
 
 ```js
-import Authlify from 'authlify-js'
+import NetlifyAuth from 'netlify-auth-js'
 
-const authlify = new Authlify({
-  APIUrl: 'https://authlify.netlify.com'
+const auth = new NetlifyAuth({
+  APIUrl: 'https://auth.netlify.com'
 });
 
-authlify.signup(username, email).then(
+auth.signup(username, email).then(
   (response) => console.log("Confirmation email sent"),
   (error) => console.log("Error during signup: %o", error.msg)
 );
 
-authlify.confirm(token).then(
+auth.confirm(token).then(
   (user) => console.log("Logged in as %s", user.email),
   (error) => console.log("Failed to log in: %o", error)
 );
 
-authlify.login(email, password).then(
+auth.login(email, password).then(
   (user) => console.log("Logged in as %s", user.email),
   (error) => console.log("Failed to log in: %o", error);
 )
 
-authlify.requestPasswordRecovery(email).then(
+auth.requestPasswordRecovery(email).then(
   (response) => console.log("Recovery email sent"),
   (error) => console.log("Error sending recovery mail: %o", error)
 );
 
-authlify.recover(token).then(
+auth.recover(token).then(
   (user) => console.log("Logged in as %s", user.email),
   (error) => console.log("Failed to verify recover token: %o", error)
 );
 
-const user = authlify.currentUser()
+const user = auth.currentUser()
 
 user.update({email: newEmail, password: newPassword}).then(
   (user) => console.log("Updated user"),

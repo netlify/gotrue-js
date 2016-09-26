@@ -1,12 +1,12 @@
 {
-  "name": "authlify-js",
+  "name": "netlify-auth-js",
   "version": "0.5.2",
-  "description": "Authlify API client for JavaScript",
+  "description": "Netlify Auth API client for JavaScript",
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel --presets es2015 --plugins syntax-object-rest-spread,transform-object-rest-spread -d lib/ src/",
     "prepublish": "npm run compile",
-    "babelify": "browserify src/index.js -t [ babelify --presets [ es2015 ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/authlify.js"
+    "babelify": "browserify src/index.js -t [ babelify --presets [ es2015 ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/netlify-auth.js"
   },
   "author": "Mathias Biilmann Christensen",
   "license": "MIT",

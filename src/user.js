@@ -1,7 +1,7 @@
 import API from './api';
 
 const ExpiryMargin = 60 * 1000;
-const storageKey = "authlify.user";
+const storageKey = "netlify.auth.user";
 let currentUser = null;
 
 export default class User {
