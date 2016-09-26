@@ -3,13 +3,13 @@ import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
 
-export default class Authlify {
+export default class NetlifyAuth {
   constructor(options = {}) {
     if (!options.APIUrl) {
-      throw("You must specify an APIUrl of your Authlify instance");
+      throw("You must specify an APIUrl of your Netlify Auth instance");
     }
     if (options.APIUrl.match(HTTPRegexp)) {
-      console.log('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR AUTHLIFY EVER!\nAuthlify REQUIRES HTTPS to work securely.')
+      console.log('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR NETLIFY AUTH EVER!\nNetlify Auth REQUIRES HTTPS to work securely.')
     }
     this.api = new API(options.APIUrl);
   }
@@ -68,5 +68,5 @@ export default class Authlify {
 }
 
 if (typeof window !== "undefined") {
-  window.Authlify = Authlify
+  window.NetlifyAuth = NetlifyAuth
 }
