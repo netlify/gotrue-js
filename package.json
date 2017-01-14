@@ -1,6 +1,6 @@
 {
   "name": "netlify-auth-js",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Netlify Auth API client for JavaScript",
   "main": "lib/index.js",
   "scripts": {

@@ -44,6 +44,10 @@ export default class User {
         this.processTokenResponse(response);
         this.refreshPersistedSession(this);
         return this.jwt_token;
+      }).catch((error) => {
+        console.error('failed to refresh token: %o', error);
+        this.persistSession(null);
+        return Promise.reject(error);
       });
     }
     return Promise.resolve(this.jwt_token);
