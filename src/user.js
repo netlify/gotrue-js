@@ -1,4 +1,4 @@
-import API from './api';
+import API from 'micro-api-client';
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = "netlify.auth.user";
@@ -35,11 +35,12 @@ export default class User {
   }
 
   jwt() {
-    if (this.jwt_expiry - ExpiryMargin < new Date().getTime()) {
+    const {jwt_expiry, refreshToken, jwt_token} = this.tokenDetails();
+    if (jwt_expiry - ExpiryMargin < new Date().getTime()) {
       return this.api.request('/token', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `grant_type=refresh_token&refresh_token=${this.refreshToken}`
+        body: `grant_type=refresh_token&refresh_token=${refreshToken}`
       }).then((response) => {
         this.processTokenResponse(response);
         this.refreshPersistedSession(this);
@@ -47,10 +48,11 @@ export default class User {
       }).catch((error) => {
         console.error('failed to refresh token: %o', error);
         this.persistSession(null);
+        this.jwt_expiry = this.refreshToken = this.jwt_token = null;
         return Promise.reject(error);
       });
     }
-    return Promise.resolve(this.jwt_token);
+    return Promise.resolve(jwt_token);
   }
 
   logout() {
@@ -104,6 +106,19 @@ export default class User {
     } else {
       localStorage.removeItem(storageKey);
     }
+    return user;
+  }
+
+  tokenDetails() {
+    const fromStorage = localStorage.getItem(storageKey);
+    if (fromStorage) {
+      return JSON.parse(fromStorage);
+    }
+    return {
+      expires_in: this.expires_in,
+      refreshToken: this.refreshToken,
+      jwt_token: this.jwt_token
+    };
   }
 
   clearSession() {

@@ -1,4 +1,4 @@
-import API from './api';
+import API from 'micro-api-client';
 import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
@@ -27,7 +27,7 @@ export default class NetlifyAuth {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: `grant_type=password&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
     })
-      .then((response) => new User(this.api, response).reload())
+      .then((response) => new User(this.api, response).persistSession(null).reload())
       .then((user) => {
         if (remember) {
           user.persistSession(user);
