@@ -1,6 +1,6 @@
-# Netlify Auth JS Client
+# GoTrue JS Client
 
-This is a JS library for [Netlify Auth](https://github.com/netlify/netlify-auth) API.
+This is a JS library for [GoTrue](https://github.com/netlify/gotrue) API.
 
 It lets you signup and authenticate users and is a building block for constructing
 the UI for signups, password recovery, login and logout.
@@ -8,9 +8,9 @@ the UI for signups, password recovery, login and logout.
 ## Usage
 
 ```js
-import NetlifyAuth from 'netlify-auth-js'
+import GoTrue from 'gotrue-js'
 
-const auth = new NetlifyAuth({
+const auth = new GoTrue({
   APIUrl: 'https://auth.netlify.com'
 });
 

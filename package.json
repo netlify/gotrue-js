@@ -1,12 +1,12 @@
 {
-  "name": "netlify-auth-js",
+  "name": "gotrue-js",
   "version": "0.5.5",
-  "description": "Netlify Auth API client for JavaScript",
+  "description": "GoTrue API client for JavaScript",
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel --presets es2015 --plugins syntax-object-rest-spread,transform-object-rest-spread -d lib/ src/",
     "prepublish": "npm run compile",
-    "babelify": "browserify src/index.js -t [ babelify --presets [ es2015 ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/netlify-auth.js"
+    "babelify": "browserify src/index.js -t [ babelify --presets [ es2015 ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/gotrue.js"
   },
   "author": "Mathias Biilmann Christensen",
   "license": "MIT",

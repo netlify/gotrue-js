@@ -1,7 +1,7 @@
 import API from 'micro-api-client';
 
 const ExpiryMargin = 60 * 1000;
-const storageKey = "netlify.auth.user";
+const storageKey = "gotrue.user";
 let currentUser = null;
 
 export default class User {
