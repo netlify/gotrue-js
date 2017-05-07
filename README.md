@@ -14,7 +14,7 @@ const auth = new GoTrue({
   APIUrl: 'https://auth.netlify.com'
 });
 
-auth.signup(username, email).then(
+auth.signup(email, password).then(
   (response) => console.log("Confirmation email sent"),
   (error) => console.log("Error during signup: %o", error.msg)
 );
