@@ -5,9 +5,10 @@ const storageKey = "gotrue.user";
 let currentUser = null;
 
 export default class User {
-  constructor(api, tokenResponse) {
+  constructor(api, tokenResponse, audience) {
     this.api = api;
     this.processTokenResponse(tokenResponse);
+    this.audience = audience;
   }
 
   static recoverSession() {
@@ -37,7 +38,7 @@ export default class User {
   jwt() {
     const {jwt_expiry, refreshToken, jwt_token} = this.tokenDetails();
     if (jwt_expiry - ExpiryMargin < new Date().getTime()) {
-      return this.api.request('/token', {
+      return this.request('/token', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: `grant_type=refresh_token&refresh_token=${refreshToken}`
@@ -62,8 +63,15 @@ export default class User {
   }
 
   request(path, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+
+    if (this.audience){
+      options.headers['X-JWT-AUD'] = this.audience;
+    }
+
     return this.jwt().then((token) => this.api.request(path, {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: Object.assign(options.headers, {Authorization: `Bearer ${token}`}),
       ...options
     }));
   }
@@ -123,5 +131,11 @@ export default class User {
 
   clearSession() {
     localStorage.removeItem(storageKey);
+  }
+
+  user_list(){
+    return this.request('/admin/users', {
+      method: 'GET'
+    })
   }
 }
