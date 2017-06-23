@@ -35,11 +35,37 @@ export default class GoTrue {
     });
   }
 
+  signupExternal(provider, provider_code, data) {
+    return this.request('/signup', {
+      method: 'POST',
+      body: JSON.stringify({provider, provider_code, data})
+    });
+  }
+
   login(email, password, remember) {
     return this.request('/token', {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: `grant_type=password&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    })
+      .then((response) => {
+        const user = new User(this.api, response, this.audience);
+        user.persistSession(null)
+        return user.reload();
+      })
+      .then((user) => {
+        if (remember) {
+          user.persistSession(user);
+        }
+        return user;
+      });
+  }
+
+  loginExternal(provider, code, remember) {
+    return this.request('/token', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: `grant_type=authorization_code&code=${code}&provider=${provider}`
     })
       .then((response) => {
         const user = new User(this.api, response, this.audience);
