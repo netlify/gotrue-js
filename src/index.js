@@ -35,10 +35,10 @@ export default class GoTrue {
     });
   }
 
-  signupExternal(provider, provider_code, data) {
+  signupExternal(provider, code, data) {
     return this.request('/signup', {
       method: 'POST',
-      body: JSON.stringify({provider, provider_code, data})
+      body: JSON.stringify({provider, code, data})
     });
   }
 
