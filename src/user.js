@@ -66,7 +66,9 @@ export default class User {
     options = options || {};
     options.headers = options.headers || {};
 
-    if (this.audience){
+    if (options.audience){
+      options.headers['X-JWT-AUD'] = options.audience;
+    } else if (this.audience){
       options.headers['X-JWT-AUD'] = this.audience;
     }
 
@@ -133,9 +135,59 @@ export default class User {
     localStorage.removeItem(storageKey);
   }
 
-  user_list(){
+
+  // Return a list of all users in an audience
+  adminUsers(aud){
     return this.request('/admin/users', {
-      method: 'GET'
+      method: 'GET',
+      audience: aud
     })
   }
+
+  // Create a user to be referenced in an admin request
+  adminUser(email_or_id, aud){
+    var u = {user: {}};
+    if (typeof aud === 'undefined'){
+      u.user._id = email_or_id;
+    } else {
+      u.user.email = email_or_id;
+      u.user.aud = aud;
+    }
+    return u;
+  }
+
+  adminGetUser(user){
+    return this.request('/admin/user', {
+      method: 'GET',
+      body: JSON.stringify(user)
+    });
+  }
+
+  adminUpdateUser(user, attributes){
+    attributes = attributes || {};
+    attributes.user = user;
+    return this.request('/admin/user', {
+      method: 'PUT',
+      body: JSON.stringify(attributes)
+    });
+  }
+
+  adminCreateUser(email, password, attributes) {
+    attributes = attributes || {};
+    attributes.email = email;
+    attributes.password = password;
+    return this.request('/admin/user', {
+      method: 'POST',
+      body: JSON.stringify(attributes)
+    });
+  }
+
+  adminDeleteUser(user) {
+    return this.request('/admin/user/', {
+        method: 'DELETE',
+        body: JSON.stringify(user)
+    });
+  }
+
+
 }
