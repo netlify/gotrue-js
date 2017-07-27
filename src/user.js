@@ -5,9 +5,10 @@ const storageKey = "gotrue.user";
 let currentUser = null;
 
 export default class User {
-  constructor(api, tokenResponse) {
+  constructor(api, tokenResponse, audience) {
     this.api = api;
     this.processTokenResponse(tokenResponse);
+    this.audience = audience;
   }
 
   static recoverSession() {
@@ -37,7 +38,7 @@ export default class User {
   jwt() {
     const {jwt_expiry, refreshToken, jwt_token} = this.tokenDetails();
     if (jwt_expiry - ExpiryMargin < new Date().getTime()) {
-      return this.api.request('/token', {
+      return this.request('/token', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: `grant_type=refresh_token&refresh_token=${refreshToken}`
@@ -62,8 +63,17 @@ export default class User {
   }
 
   request(path, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+
+    if (options.audience){
+      options.headers['X-JWT-AUD'] = options.audience;
+    } else if (this.audience){
+      options.headers['X-JWT-AUD'] = this.audience;
+    }
+
     return this.jwt().then((token) => this.api.request(path, {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: Object.assign(options.headers, {Authorization: `Bearer ${token}`}),
       ...options
     }));
   }
@@ -124,4 +134,60 @@ export default class User {
   clearSession() {
     localStorage.removeItem(storageKey);
   }
+
+
+  // Return a list of all users in an audience
+  adminUsers(aud){
+    return this.request('/admin/users', {
+      method: 'GET',
+      audience: aud
+    })
+  }
+
+  // Create a user to be referenced in an admin request
+  adminUser(email_or_id, aud){
+    var u = {user: {}};
+    if (typeof aud === 'undefined'){
+      u.user._id = email_or_id;
+    } else {
+      u.user.email = email_or_id;
+      u.user.aud = aud;
+    }
+    return u;
+  }
+
+  adminGetUser(user){
+    return this.request('/admin/user', {
+      method: 'GET',
+      body: JSON.stringify(user)
+    });
+  }
+
+  adminUpdateUser(user, attributes){
+    attributes = attributes || {};
+    attributes.user = user;
+    return this.request('/admin/user', {
+      method: 'PUT',
+      body: JSON.stringify(attributes)
+    });
+  }
+
+  adminCreateUser(email, password, attributes) {
+    attributes = attributes || {};
+    attributes.email = email;
+    attributes.password = password;
+    return this.request('/admin/user', {
+      method: 'POST',
+      body: JSON.stringify(attributes)
+    });
+  }
+
+  adminDeleteUser(user) {
+    return this.request('/admin/user/', {
+        method: 'DELETE',
+        body: JSON.stringify(user)
+    });
+  }
+
+
 }
