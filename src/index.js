@@ -23,9 +23,9 @@ export default class GoTrue {
   request(path, options){
     options.headers = options.headers || {};
     if (options.audience){
-      headers['X-JWT-AUD'] = options.audience;
+      options.headers['X-JWT-AUD'] = options.audience;
     } else if (this.audience) {
-      headers['X-JWT-AUD'] = this.audience;
+      options.headers['X-JWT-AUD'] = this.audience;
     }
     return this.api.request(path, options)
   }
