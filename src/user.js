@@ -38,7 +38,7 @@ export default class User {
   jwt() {
     const {jwt_expiry, refreshToken, jwt_token} = this.tokenDetails();
     if (jwt_expiry - ExpiryMargin < new Date().getTime()) {
-      return this.request('/token', {
+      return this.api.request('/token', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: `grant_type=refresh_token&refresh_token=${refreshToken}`
