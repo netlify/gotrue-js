@@ -6,11 +6,11 @@ const HTTPRegexp = /^http:\/\//;
 export default class GoTrue {
   constructor(options = {}) {
     if (!options.APIUrl) {
-      throw("You must specify an APIUrl of your GoTrue instance");
+      options.APIUrl = 'https://' + window.location.hostname + '/.netlify/identity'
     }
 
     if (options.APIUrl.match(HTTPRegexp)) {
-      console.log('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.')
+      console.warn('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.')
     }
 
     if (options.Audience) {
