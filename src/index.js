@@ -2,30 +2,26 @@ import API from 'micro-api-client';
 import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
+const defaultApiURL = 'https://' + window.location.hostname + '/.netlify/identity';
 
 export default class GoTrue {
-  constructor(options = {}) {
-    if (!options.APIUrl) {
-      options.APIUrl = 'https://' + window.location.hostname + '/.netlify/identity'
-    }
-
-    if (options.APIUrl.match(HTTPRegexp)) {
+  constructor({ APIUrl = defaultApiURL, Audience = '' } = {}) {
+    if (APIUrl.match(HTTPRegexp)) {
       console.warn('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.')
     }
 
-    if (options.Audience) {
-      this.audience = options.Audience;
+    if (Audience) {
+      this.audience = Audience;
     }
 
-    this.api = new API(options.APIUrl);
+    this.api = new API(APIUrl);
   }
 
-  request(path, options){
+  request(path, options = {}) {
     options.headers = options.headers || {};
-    if (options.audience){
-      options.headers['X-JWT-AUD'] = options.audience;
-    } else if (this.audience) {
-      options.headers['X-JWT-AUD'] = this.audience;
+    const aud = options.audience || this.audience;
+    if (aud){
+      options.headers['X-JWT-AUD'] = aud;
     }
     return this.api.request(path, options)
   }

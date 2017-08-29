@@ -10,9 +10,7 @@ the UI for signups, password recovery, login and logout.
 ```js
 import GoTrue from 'gotrue-js'
 
-const auth = new GoTrue({
-  APIUrl: 'https://auth.netlify.com'
-});
+const auth = new GoTrue();
 
 auth.signup(email, password).then(
   (response) => console.log("Confirmation email sent"),
