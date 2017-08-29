@@ -1,7 +1,8 @@
 import API from 'micro-api-client';
+import Admin from './admin';
 
 const ExpiryMargin = 60 * 1000;
-const storageKey = "gotrue.user";
+const storageKey = 'gotrue.user';
 let currentUser = null;
 
 export default class User {
@@ -9,6 +10,7 @@ export default class User {
     this.api = api;
     this.processTokenResponse(tokenResponse);
     this.audience = audience;
+    this.admin = new Admin(this);
   }
 
   static recoverSession() {
@@ -93,12 +95,10 @@ export default class User {
   }
 
   processTokenResponse(tokenResponse) {
-    const now = new Date();
     this.tokenResponse = tokenResponse;
     this.refreshToken = tokenResponse.refresh_token;
     this.jwt_token = tokenResponse.access_token;
-    now.setTime(now.getTime() + (tokenResponse.expires_in * 1000));
-    this.jwt_expiry = now.getTime();
+    this.jwt_expiry = Date.now() + (tokenResponse.expires_in * 1000);
   }
 
   refreshPersistedSession(user) {
@@ -134,60 +134,4 @@ export default class User {
   clearSession() {
     localStorage.removeItem(storageKey);
   }
-
-
-  // Return a list of all users in an audience
-  adminUsers(aud){
-    return this.request('/admin/users', {
-      method: 'GET',
-      audience: aud
-    })
-  }
-
-  // Create a user to be referenced in an admin request
-  adminUser(email_or_id, aud){
-    var u = {user: {}};
-    if (typeof aud === 'undefined'){
-      u.user._id = email_or_id;
-    } else {
-      u.user.email = email_or_id;
-      u.user.aud = aud;
-    }
-    return u;
-  }
-
-  adminGetUser(user){
-    return this.request('/admin/user', {
-      method: 'GET',
-      body: JSON.stringify(user)
-    });
-  }
-
-  adminUpdateUser(user, attributes){
-    attributes = attributes || {};
-    attributes.user = user;
-    return this.request('/admin/user', {
-      method: 'PUT',
-      body: JSON.stringify(attributes)
-    });
-  }
-
-  adminCreateUser(email, password, attributes) {
-    attributes = attributes || {};
-    attributes.email = email;
-    attributes.password = password;
-    return this.request('/admin/user', {
-      method: 'POST',
-      body: JSON.stringify(attributes)
-    });
-  }
-
-  adminDeleteUser(user) {
-    return this.request('/admin/user/', {
-        method: 'DELETE',
-        body: JSON.stringify(user)
-    });
-  }
-
-
 }
