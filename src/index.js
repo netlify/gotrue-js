@@ -1,61 +1,58 @@
-import API from 'micro-api-client';
-import User from './user';
+import API from "micro-api-client";
+import User from "./user";
 
 const HTTPRegexp = /^http:\/\//;
+const defaultApiURL = `https://${window.location.hostname}/.netlify/identity`;
 
 export default class GoTrue {
-  constructor(options = {}) {
-    if (!options.APIUrl) {
-      options.APIUrl = 'https://' + window.location.hostname + '/.netlify/identity'
+  constructor({ APIUrl = defaultApiURL, Audience = "" } = {}) {
+    if (APIUrl.match(HTTPRegexp)) {
+      console.warn(
+        "Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely."
+      );
     }
 
-    if (options.APIUrl.match(HTTPRegexp)) {
-      console.warn('Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.')
+    if (Audience) {
+      this.audience = Audience;
     }
 
-    if (options.Audience) {
-      this.audience = options.Audience;
-    }
-
-    this.api = new API(options.APIUrl);
+    this.api = new API(APIUrl);
   }
 
-  request(path, options){
+  request(path, options = {}) {
     options.headers = options.headers || {};
-    if (options.audience){
-      options.headers['X-JWT-AUD'] = options.audience;
-    } else if (this.audience) {
-      options.headers['X-JWT-AUD'] = this.audience;
+    const aud = options.audience || this.audience;
+    if (aud) {
+      options.headers["X-JWT-AUD"] = aud;
     }
-    return this.api.request(path, options)
+    return this.api.request(path, options);
   }
 
   signup(email, password, data) {
-    return this.request('/signup', {
-      method: 'POST',
-      body: JSON.stringify({email, password, data})
+    return this.request("/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, password, data })
     });
   }
 
-  signupExternal(provider, code, data) {
-    return this.request('/signup', {
-      method: 'POST',
-      body: JSON.stringify({provider, code, data})
-    });
+  signupExternal(provider) {
+    return this.request("/authorize?provider=" + provider);
   }
 
   login(email, password, remember) {
-    return this.request('/token', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `grant_type=password&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    return this.request("/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `grant_type=password&username=${encodeURIComponent(
+        email
+      )}&password=${encodeURIComponent(password)}`
     })
-      .then((response) => {
+      .then(response => {
         const user = new User(this.api, response, this.audience);
-        user.persistSession(null)
+        user.persistSession(null);
         return user.reload();
       })
-      .then((user) => {
+      .then(user => {
         if (remember) {
           user.persistSession(user);
         }
@@ -63,38 +60,23 @@ export default class GoTrue {
       });
   }
 
-  loginExternal(provider, code, remember) {
-    return this.request('/token', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: `grant_type=authorization_code&code=${code}&provider=${provider}`
-    })
-      .then((response) => {
-        const user = new User(this.api, response, this.audience);
-        user.persistSession(null)
-        return user.reload();
-      })
-      .then((user) => {
-        if (remember) {
-          user.persistSession(user);
-        }
-        return user;
-      });
+  loginExternal(provider) {
+    return this.request("/authorize?provider=" + provider);
   }
 
   confirm(token) {
-    return this.verify('signup', token);
+    return this.verify("signup", token);
   }
 
   requestPasswordRecovery(email) {
-    return this.request('/recover', {
-      method: 'POST',
-      body: JSON.stringify({email})
+    return this.request("/recover", {
+      method: "POST",
+      body: JSON.stringify({ email })
     });
   }
 
   recover(token) {
-    return this.verify('recovery', token);
+    return this.verify("recovery", token);
   }
 
   user(tokenResponse) {
@@ -106,13 +88,13 @@ export default class GoTrue {
   }
 
   verify(type, token) {
-    return this.request('/verify', {
-      method: 'POST',
-      body: JSON.stringify({token, type})
-    }).then((response) => new User(this.api, response).reload());
+    return this.request("/verify", {
+      method: "POST",
+      body: JSON.stringify({ token, type })
+    }).then(response => new User(this.api, response).reload());
   }
 }
 
 if (typeof window !== "undefined") {
-  window.GoTrue = GoTrue
+  window.GoTrue = GoTrue;
 }
