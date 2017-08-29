@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "babel --presets es2015 --plugins syntax-object-rest-spread,transform-object-rest-spread -d lib/ src/",
     "prepublish": "npm run compile",
+    "version": "npm run babelify && git add browser/gotrue.js",
     "babelify": "browserify src/index.js -t [ babelify --presets [ es2015 ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/gotrue.js"
   },
   "author": "Mathias Biilmann Christensen",
