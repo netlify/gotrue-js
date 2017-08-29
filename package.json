@@ -1,6 +1,6 @@
 {
   "name": "gotrue-js",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "GoTrue API client for JavaScript",
   "main": "lib/index.js",
   "scripts": {
