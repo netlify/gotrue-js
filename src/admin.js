@@ -35,7 +35,7 @@ export default class Admin {
   }
 
   deleteUser(user) {
-    return this.user.request("/admin/user/", {
+    return this.user.request("/admin/user", {
       method: "DELETE",
       body: JSON.stringify(user)
     });
