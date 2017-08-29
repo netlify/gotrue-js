@@ -79,8 +79,15 @@ export default class GoTrue {
     return this.verify("recovery", token);
   }
 
+  acceptInvite(token, password) {
+    return this.request("/verify", {
+      method: "POST",
+      body: JSON.stringify({ token, password, type: "signup" })
+    }).then(response => new User(this.api, response).reload());
+  }
+
   user(tokenResponse) {
-    return new User(this.api, tokenResponse);
+    return new User(this.api, tokenResponse, this.audience);
   }
 
   currentUser() {
