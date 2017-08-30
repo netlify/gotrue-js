@@ -55,7 +55,6 @@ export default class User {
           return this.jwt_token;
         })
         .catch(error => {
-          console.error("failed to refresh token: %o", error);
           this.persistSession(null);
           this.jwt_expiry = this.refreshToken = this.jwt_token = null;
           return Promise.reject(error);
