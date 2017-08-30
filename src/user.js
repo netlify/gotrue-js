@@ -42,7 +42,7 @@ export default class User {
 
   jwt() {
     const { jwt_expiry, refreshToken, jwt_token } = this.tokenDetails();
-    if (jwt_expiry - ExpiryMargin < new Date().getTime()) {
+    if (jwt_expiry - ExpiryMargin < Date.now()) {
       return this.api
         .request("/token", {
           method: "POST",
@@ -69,8 +69,7 @@ export default class User {
       .catch(this.clearSession.bind(this));
   }
 
-  request(path, options) {
-    options = options || {};
+  request(path, options = {}) {
     options.headers = options.headers || {};
 
     const aud = options.audience || this.audience;
