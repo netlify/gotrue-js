@@ -1,4 +1,3 @@
-import queryString from "query-string";
 
 export default class Admin {
   constructor(user) {
@@ -14,12 +13,11 @@ export default class Admin {
   }
 
   getUser(user) {
-    return this.user.request("/admin/user?" + queryString.stringify(user));
+    return this.user.request(`/admin/users/${user.id}`);
   }
 
   updateUser(user, attributes = {}) {
-    attributes.user = user;
-    return this.user.request("/admin/user", {
+    return this.user.request(`/admin/users/${user.id}`, {
       method: "PUT",
       body: JSON.stringify(attributes)
     });
@@ -28,16 +26,15 @@ export default class Admin {
   createUser(email, password, attributes = {}) {
     attributes.email = email;
     attributes.password = password;
-    return this.user.request("/admin/user", {
+    return this.user.request("/admin/users", {
       method: "POST",
       body: JSON.stringify(attributes)
     });
   }
 
   deleteUser(user) {
-    return this.user.request("/admin/user", {
-      method: "DELETE",
-      body: JSON.stringify(user)
+    return this.user.request(`/admin/users/${user.id}`, {
+      method: "DELETE"
     });
   }
 }
