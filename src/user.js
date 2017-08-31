@@ -10,7 +10,6 @@ export default class User {
     this.api = api;
     this.processTokenResponse(tokenResponse);
     this.audience = audience;
-    this.admin = new Admin(this);
   }
 
   static recoverSession() {
@@ -26,6 +25,10 @@ export default class User {
     }
 
     return null;
+  }
+
+  get admin() {
+    return new Admin(this);
   }
 
   update(attributes) {
