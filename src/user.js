@@ -4,12 +4,20 @@ import Admin from "./admin";
 const ExpiryMargin = 60 * 1000;
 const storageKey = "gotrue.user";
 let currentUser = null;
+const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
+const forbiddenSaveAttributes = { api: 1 };
 
 export default class User {
   constructor(api, tokenResponse, audience) {
     this.api = api;
-    this.processTokenResponse(tokenResponse);
+    this.url = api.apiURL;
     this.audience = audience;
+    this._processTokenResponse(tokenResponse);
+    currentUser = this;
+  }
+
+  static removeSavedSession() {
+    localStorage.removeItem(storageKey);
   }
 
   static recoverSession() {
@@ -19,9 +27,18 @@ export default class User {
 
     const json = localStorage.getItem(storageKey);
     if (json) {
-      const data = JSON.parse(json);
-      const api = new API(data.api.apiURL);
-      return new User(api, data.tokenResponse).process(data);
+      try {
+        const data = JSON.parse(json);
+        const { url, token, audience } = data;
+        if (!url || !token) {
+          return null;
+        }
+
+        const api = new API(url);
+        return new User(api, token, audience)._saveUserData(data);
+      } catch (ex) {
+        return null;
+      }
     }
 
     return null;
@@ -32,47 +49,43 @@ export default class User {
   }
 
   update(attributes) {
-    return this.request("/user", {
+    return this._request("/user", {
       method: "PUT",
       body: JSON.stringify(attributes)
     }).then(response => {
-      for (var key in response) {
-        this[key] = response[key];
-      }
-      return this;
+      return this._saveUserData(response)._refreshSavedSession();
     });
   }
 
   jwt() {
-    const { jwt_expiry, refreshToken, jwt_token } = this.tokenDetails();
-    if (jwt_expiry - ExpiryMargin < Date.now()) {
+    const { expires_at, refresh_token, access_token } = this.tokenDetails();
+    if (expires_at - ExpiryMargin < Date.now()) {
       return this.api
-        .request("/token", {
+        ._request("/token", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `grant_type=refresh_token&refresh_token=${refreshToken}`
+          body: `grant_type=refresh_token&refresh_token=${refresh_token}`
         })
         .then(response => {
-          this.processTokenResponse(response);
-          this.refreshPersistedSession(this);
-          return this.jwt_token;
+          this._processTokenResponse(response);
+          this._refreshSavedSession();
+          return this.token.access_token;
         })
         .catch(error => {
-          this.persistSession(null);
-          this.jwt_expiry = this.refreshToken = this.jwt_token = null;
+          this.clearSession();
           return Promise.reject(error);
         });
     }
-    return Promise.resolve(jwt_token);
+    return Promise.resolve(access_token);
   }
 
   logout() {
-    return this.request("/logout", { method: "POST" })
+    return this._request("/logout", { method: "POST" })
       .then(this.clearSession.bind(this))
       .catch(this.clearSession.bind(this));
   }
 
-  request(path, options = {}) {
+  _request(path, options = {}) {
     options.headers = options.headers || {};
 
     const aud = options.audience || this.audience;
@@ -90,60 +103,58 @@ export default class User {
     );
   }
 
-  reload() {
-    return this.request("/user")
-      .then(this.process.bind(this))
-      .then(this.refreshPersistedSession.bind(this));
+  getUserData() {
+    return this._request("/user")
+      .then(this._saveUserData.bind(this))
+      .then(this._refreshSavedSession.bind(this));
   }
 
-  process(attributes) {
-    for (var key in attributes) {
-      if (key in User.prototype || key == "api") {
-        continue;
+  _saveUserData(attributes) {
+    for (const key in attributes) {
+      if (key in User.prototype || key in forbiddenUpdateAttributes) {
+        continue
       }
       this[key] = attributes[key];
     }
     return this;
   }
 
-  processTokenResponse(tokenResponse) {
-    this.tokenResponse = tokenResponse;
-    this.refreshToken = tokenResponse.refresh_token;
-    this.jwt_token = tokenResponse.access_token;
-    this.jwt_expiry = Date.now() + tokenResponse.expires_in * 1000;
+  _processTokenResponse(tokenResponse) {
+    this.token = tokenResponse;
+    this.token.expires_at = Date.now() + tokenResponse.expires_in * 1000;
   }
 
-  refreshPersistedSession(user) {
-    currentUser = user;
+  _refreshSavedSession() {
+    // only update saved session if we previously saved something
     if (localStorage.getItem(storageKey)) {
-      this.persistSession(user);
+      this._saveSession();
     }
-    return user;
+    return this;
   }
 
-  persistSession(user) {
-    currentUser = user;
-    if (user) {
-      localStorage.setItem(storageKey, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(storageKey);
+  get _details() {
+    const userCopy = {};
+    for (const key in this) {
+      if (key in User.prototype || key in forbiddenSaveAttributes) {
+        continue
+      }
+      userCopy[key] = this[key];
     }
-    return user;
+    return userCopy;
+  }
+
+  _saveSession() {
+    localStorage.setItem(storageKey, JSON.stringify(this._details));
+    return this;
   }
 
   tokenDetails() {
-    const fromStorage = localStorage.getItem(storageKey);
-    if (fromStorage) {
-      return JSON.parse(fromStorage);
-    }
-    return {
-      expires_in: this.expires_in,
-      refreshToken: this.refreshToken,
-      jwt_token: this.jwt_token
-    };
+    return this.token;
   }
 
   clearSession() {
-    localStorage.removeItem(storageKey);
+    User.removeSavedSession();
+    this.token = null;
+    currentUser = null;
   }
 }

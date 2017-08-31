@@ -5,21 +5,21 @@ const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `https://${window.location.hostname}/.netlify/identity`;
 
 export default class GoTrue {
-  constructor({ APIUrl = defaultApiURL, Audience = "" } = {}) {
+  constructor({ APIUrl = defaultApiURL, audience = "" } = {}) {
     if (APIUrl.match(HTTPRegexp)) {
       console.warn(
         "Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely."
       );
     }
 
-    if (Audience) {
-      this.audience = Audience;
+    if (audience) {
+      this.audience = audience;
     }
 
     this.api = new API(APIUrl);
   }
 
-  request(path, options = {}) {
+  _request(path, options = {}) {
     options.headers = options.headers || {};
     const aud = options.audience || this.audience;
     if (aud) {
@@ -29,18 +29,18 @@ export default class GoTrue {
   }
 
   signup(email, password, data) {
-    return this.request("/signup", {
+    return this._request("/signup", {
       method: "POST",
       body: JSON.stringify({ email, password, data })
     });
   }
 
   signupExternal(provider) {
-    return this.request("/authorize?provider=" + provider);
+    return this._request("/authorize?provider=" + provider);
   }
 
   login(email, password, remember) {
-    return this.request("/token", {
+    return this._request("/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `grant_type=password&username=${encodeURIComponent(
@@ -48,20 +48,13 @@ export default class GoTrue {
       )}&password=${encodeURIComponent(password)}`
     })
       .then(response => {
-        const user = new User(this.api, response, this.audience);
-        user.persistSession(null);
-        return user.reload();
-      })
-      .then(user => {
-        if (remember) {
-          user.persistSession(user);
-        }
-        return user;
+        User.removeSavedSession();
+        return this.createUser(response, remember);
       });
   }
 
   loginExternal(provider) {
-    return this.request("/authorize?provider=" + provider);
+    return this._request("/authorize?provider=" + provider);
   }
 
   confirm(token) {
@@ -69,7 +62,7 @@ export default class GoTrue {
   }
 
   requestPasswordRecovery(email) {
-    return this.request("/recover", {
+    return this._request("/recover", {
       method: "POST",
       body: JSON.stringify({ email })
     });
@@ -80,14 +73,21 @@ export default class GoTrue {
   }
 
   acceptInvite(token, password) {
-    return this.request("/verify", {
+    return this._request("/verify", {
       method: "POST",
       body: JSON.stringify({ token, password, type: "signup" })
-    }).then(response => new User(this.api, response).reload());
+    }).then(response => this.createUser(response));
   }
 
-  user(tokenResponse) {
-    return new User(this.api, tokenResponse, this.audience);
+  createUser(tokenResponse, remember = false) {
+    const user = new User(this.api, tokenResponse, this.audience);
+    return user.getUserData()
+      .then(user => {
+        if (remember) {
+          user._saveSession();
+        }
+        return user;
+      });
   }
 
   currentUser() {
@@ -95,10 +95,10 @@ export default class GoTrue {
   }
 
   verify(type, token) {
-    return this.request("/verify", {
+    return this._request("/verify", {
       method: "POST",
       body: JSON.stringify({ token, type })
-    }).then(response => new User(this.api, response).reload());
+    }).then(response => this.createUser(response));
   }
 }
 
