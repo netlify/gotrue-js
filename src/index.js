@@ -35,10 +35,6 @@ export default class GoTrue {
     });
   }
 
-  signupExternal(provider) {
-    return this._request("/authorize?provider=" + provider);
-  }
-
   login(email, password, remember) {
     return this._request("/token", {
       method: "POST",
@@ -53,8 +49,8 @@ export default class GoTrue {
       });
   }
 
-  loginExternal(provider) {
-    return this._request("/authorize?provider=" + provider);
+  loginExternalUrl(provider) {
+    return this.api.apiURL + "/authorize?provider=" + provider;
   }
 
   confirm(token) {
