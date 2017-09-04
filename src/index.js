@@ -54,7 +54,7 @@ export default class GoTrue {
   }
 
   loginExternalUrl(provider) {
-    return this.api.apiURL + "/authorize?provider=" + provider;
+    return `${this.api.apiURL}/authorize?provider=${provider}`;
   }
 
   confirm(token) {
