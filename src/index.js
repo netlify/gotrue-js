@@ -28,6 +28,10 @@ export default class GoTrue {
     return this.api.request(path, options);
   }
 
+  settings() {
+    return this._request("/settings");
+  }
+
   signup(email, password, data) {
     return this._request("/signup", {
       method: "POST",
