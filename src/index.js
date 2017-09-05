@@ -57,8 +57,8 @@ export default class GoTrue {
     return `${this.api.apiURL}/authorize?provider=${provider}`;
   }
 
-  confirm(token) {
-    return this.verify("signup", token);
+  confirm(token, remember) {
+    return this.verify("signup", token, remember);
   }
 
   requestPasswordRecovery(email) {
@@ -68,15 +68,15 @@ export default class GoTrue {
     });
   }
 
-  recover(token) {
-    return this.verify("recovery", token);
+  recover(token, remember) {
+    return this.verify("recovery", token, remember);
   }
 
-  acceptInvite(token, password) {
+  acceptInvite(token, password, remember) {
     return this._request("/verify", {
       method: "POST",
       body: JSON.stringify({ token, password, type: "signup" })
-    }).then(response => this.createUser(response));
+    }).then(response => this.createUser(response, remember));
   }
 
   createUser(tokenResponse, remember = false) {
@@ -94,11 +94,11 @@ export default class GoTrue {
     return User.recoverSession();
   }
 
-  verify(type, token) {
+  verify(type, token, remember) {
     return this._request("/verify", {
       method: "POST",
       body: JSON.stringify({ token, type })
-    }).then(response => this.createUser(response));
+    }).then(response => this.createUser(response, remember));
   }
 }
 
