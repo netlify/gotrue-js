@@ -1,4 +1,3 @@
-
 export default class Admin {
   constructor(user) {
     this.user = user;

@@ -93,14 +93,25 @@ export default class User {
       options.headers["X-JWT-AUD"] = aud;
     }
 
-    return this.jwt().then(token =>
-      this.api.request(path, {
-        headers: Object.assign(options.headers, {
-          Authorization: `Bearer ${token}`
-        }),
-        ...options
-      })
-    );
+    return this.jwt().then(token => {
+      return this.api
+        .request(path, {
+          headers: Object.assign(options.headers, {
+            Authorization: `Bearer ${token}`
+          }),
+          ...options
+        })
+        .catch(err => {
+          if (err instanceof JSONHTTPError && err.json) {
+            if (err.json.msg) {
+              err.message = err.json.msg;
+            } else if (err.json.error) {
+              err.message = `${err.json.error}: ${err.json.error_description}`;
+            }
+          }
+          return Promise.reject(err);
+        });
+    });
   }
 
   getUserData() {
@@ -112,7 +123,7 @@ export default class User {
   _saveUserData(attributes) {
     for (const key in attributes) {
       if (key in User.prototype || key in forbiddenUpdateAttributes) {
-        continue
+        continue;
       }
       this[key] = attributes[key];
     }
@@ -136,7 +147,7 @@ export default class User {
     const userCopy = {};
     for (const key in this) {
       if (key in User.prototype || key in forbiddenSaveAttributes) {
-        continue
+        continue;
       }
       userCopy[key] = this[key];
     }

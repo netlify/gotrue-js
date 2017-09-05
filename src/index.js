@@ -1,4 +1,4 @@
-import API from "micro-api-client";
+import API, { JSONHTTPError } from "micro-api-client";
 import User from "./user";
 
 const HTTPRegexp = /^http:\/\//;
@@ -25,7 +25,16 @@ export default class GoTrue {
     if (aud) {
       options.headers["X-JWT-AUD"] = aud;
     }
-    return this.api.request(path, options);
+    return this.api.request(path, options).catch(err => {
+      if (err instanceof JSONHTTPError && err.json) {
+        if (err.json.msg) {
+          err.message = err.json.msg;
+        } else if (err.json.error) {
+          err.message = `${err.json.error}: ${err.json.error_description}`;
+        }
+      }
+      return Promise.reject(err);
+    });
   }
 
   settings() {
@@ -46,11 +55,10 @@ export default class GoTrue {
       body: `grant_type=password&username=${encodeURIComponent(
         email
       )}&password=${encodeURIComponent(password)}`
-    })
-      .then(response => {
-        User.removeSavedSession();
-        return this.createUser(response, remember);
-      });
+    }).then(response => {
+      User.removeSavedSession();
+      return this.createUser(response, remember);
+    });
   }
 
   loginExternalUrl(provider) {
@@ -81,13 +89,12 @@ export default class GoTrue {
 
   createUser(tokenResponse, remember = false) {
     const user = new User(this.api, tokenResponse, this.audience);
-    return user.getUserData()
-      .then(user => {
-        if (remember) {
-          user._saveSession();
-        }
-        return user;
-      });
+    return user.getUserData().then(user => {
+      if (remember) {
+        user._saveSession();
+      }
+      return user;
+    });
   }
 
   currentUser() {
