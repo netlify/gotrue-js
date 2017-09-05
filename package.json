@@ -21,7 +21,7 @@
     "uglify-js": "^2.6.2"
   },
   "dependencies": {
-    "micro-api-client": "^2.0.0",
+    "micro-api-client": "^3.0.0",
     "prettier": "^1.6.1"
   }
 }
