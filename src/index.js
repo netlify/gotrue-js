@@ -87,6 +87,10 @@ export default class GoTrue {
     }).then(response => this.createUser(response, remember));
   }
 
+  acceptInviteExternalUrl(provider, token) {
+    return `${this.api.apiURL}/authorize?provider=${provider}&invite_token=${token}`;
+  }
+
   createUser(tokenResponse, remember = false) {
     const user = new User(this.api, tokenResponse, this.audience);
     return user.getUserData().then(user => {
