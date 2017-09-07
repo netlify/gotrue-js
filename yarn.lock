@@ -1604,8 +1604,8 @@ md5.js@^1.3.4:
     inherits "^2.0.1"
 
 micro-api-client@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/micro-api-client/-/micro-api-client-3.0.2.tgz#9680f2bdd4ebe6851ae90af0843fd3a3c8bfa992"
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/micro-api-client/-/micro-api-client-3.0.3.tgz#42bff18286b8374830e1abb2abedd66d9a39076b"
 
 micromatch@^2.1.5:
   version "2.3.11"
