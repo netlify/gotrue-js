@@ -61,7 +61,7 @@ export default class User {
     const { expires_at, refresh_token, access_token } = this.tokenDetails();
     if (forceRefresh || (expires_at - ExpiryMargin < Date.now())) {
       return this.api
-        ._request("/token", {
+        .request("/token", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: `grant_type=refresh_token&refresh_token=${refresh_token}`
