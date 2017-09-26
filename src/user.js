@@ -57,9 +57,9 @@ export default class User {
     });
   }
 
-  jwt() {
+  jwt(forceRefresh) {
     const { expires_at, refresh_token, access_token } = this.tokenDetails();
-    if (expires_at - ExpiryMargin < Date.now()) {
+    if (forceRefresh || (expires_at - ExpiryMargin < Date.now())) {
       return this.api
         ._request("/token", {
           method: "POST",
