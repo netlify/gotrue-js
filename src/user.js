@@ -132,7 +132,8 @@ export default class User {
 
   _processTokenResponse(tokenResponse) {
     this.token = tokenResponse;
-    this.token.expires_at = Date.now() + tokenResponse.expires_in * 1000;
+    const claims = JSON.parse(atob(tokenResponse.access_token.split('.')[1]));
+    this.token.expires_at = claims.exp * 1000;
   }
 
   _refreshSavedSession() {
