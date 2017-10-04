@@ -5,7 +5,7 @@ const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `https://${window.location.hostname}/.netlify/identity`;
 
 export default class GoTrue {
-  constructor({ APIUrl = defaultApiURL, audience = "" } = {}) {
+  constructor({ APIUrl = defaultApiURL, audience = "", setCookie = false } = {}) {
     if (APIUrl.match(HTTPRegexp)) {
       console.warn(
         "Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely."
@@ -16,7 +16,9 @@ export default class GoTrue {
       this.audience = audience;
     }
 
-    this.api = new API(APIUrl);
+    this.setCookie = setCookie;
+
+    this.api = new API(APIUrl, {defaultHeaders});
   }
 
   _request(path, options = {}) {
@@ -49,6 +51,7 @@ export default class GoTrue {
   }
 
   login(email, password, remember) {
+    this._setRememberHeaders(remember);
     return this._request("/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -66,6 +69,7 @@ export default class GoTrue {
   }
 
   confirm(token, remember) {
+    this._setRememberHeaders(remember);
     return this.verify("signup", token, remember);
   }
 
@@ -77,10 +81,12 @@ export default class GoTrue {
   }
 
   recover(token, remember) {
+    this._setRememberHeaders(remember);
     return this.verify("recovery", token, remember);
   }
 
   acceptInvite(token, password, remember) {
+    this._setRememberHeaders(remember);
     return this._request("/verify", {
       method: "POST",
       body: JSON.stringify({ token, password, type: "signup" })
@@ -92,6 +98,7 @@ export default class GoTrue {
   }
 
   createUser(tokenResponse, remember = false) {
+    this._setRememberHeaders(remember);
     const user = new User(this.api, tokenResponse, this.audience);
     return user.getUserData().then(user => {
       if (remember) {
@@ -106,10 +113,18 @@ export default class GoTrue {
   }
 
   verify(type, token, remember) {
+    this._setRememberHeaders(remember);
     return this._request("/verify", {
       method: "POST",
       body: JSON.stringify({ token, type })
     }).then(response => this.createUser(response, remember));
+  }
+
+  _setRememberHeaders(remember) {
+    if (this.setCookie) {
+      this.api.defaultHeaders = this.api.defaultHeaders || {};
+      this.api.defaultHeaders["X-Set-Cookie"] = remember ? "1" : "session";
+    }
   }
 }
 
