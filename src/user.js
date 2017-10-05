@@ -20,7 +20,7 @@ export default class User {
     localStorage.removeItem(storageKey);
   }
 
-  static recoverSession() {
+  static recoverSession(apiInstance) {
     if (currentUser) {
       return currentUser;
     }
@@ -34,8 +34,8 @@ export default class User {
           return null;
         }
 
-        const api = new API(url);
-        return new User(api, token, audience)._saveUserData(data);
+        const api = apiInstance || new API(url, {});
+        return new User(api, token, audience)._saveUserData(data, true);
       } catch (ex) {
         return null;
       }
@@ -59,7 +59,7 @@ export default class User {
 
   jwt(forceRefresh) {
     const { expires_at, refresh_token, access_token } = this.tokenDetails();
-    if (forceRefresh || (expires_at - ExpiryMargin < Date.now())) {
+    if (forceRefresh || expires_at - ExpiryMargin < Date.now()) {
       return this.api
         .request("/token", {
           method: "POST",
@@ -120,19 +120,22 @@ export default class User {
       .then(this._refreshSavedSession.bind(this));
   }
 
-  _saveUserData(attributes) {
+  _saveUserData(attributes, fromStorage) {
     for (const key in attributes) {
       if (key in User.prototype || key in forbiddenUpdateAttributes) {
         continue;
       }
       this[key] = attributes[key];
     }
+    if (fromStorage) {
+      user._fromStorage = true;
+    }
     return this;
   }
 
   _processTokenResponse(tokenResponse) {
     this.token = tokenResponse;
-    const claims = JSON.parse(atob(tokenResponse.access_token.split('.')[1]));
+    const claims = JSON.parse(atob(tokenResponse.access_token.split(".")[1]));
     this.token.expires_at = claims.exp * 1000;
   }
 
