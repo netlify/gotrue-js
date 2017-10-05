@@ -2,10 +2,12 @@ import API, { JSONHTTPError } from "micro-api-client";
 import User from "./user";
 
 const HTTPRegexp = /^http:\/\//;
-const defaultApiURL = `https://${window.location.hostname}/.netlify/identity`;
+const defaultApiURL = `/.netlify/identity`;
 
 export default class GoTrue {
-  constructor({ APIUrl = defaultApiURL, audience = "", setCookie = false } = {}) {
+  constructor(
+    { APIUrl = defaultApiURL, audience = "", setCookie = false } = {}
+  ) {
     if (APIUrl.match(HTTPRegexp)) {
       console.warn(
         "Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely."
@@ -16,9 +18,10 @@ export default class GoTrue {
       this.audience = audience;
     }
 
+    console.log("setCookie: %o", setCookie);
     this.setCookie = setCookie;
 
-    this.api = new API(APIUrl, {defaultHeaders});
+    this.api = new API(APIUrl);
   }
 
   _request(path, options = {}) {
@@ -94,7 +97,8 @@ export default class GoTrue {
   }
 
   acceptInviteExternalUrl(provider, token) {
-    return `${this.api.apiURL}/authorize?provider=${provider}&invite_token=${token}`;
+    return `${this.api
+      .apiURL}/authorize?provider=${provider}&invite_token=${token}`;
   }
 
   createUser(tokenResponse, remember = false) {
@@ -109,7 +113,9 @@ export default class GoTrue {
   }
 
   currentUser() {
-    return User.recoverSession();
+    const user = User.recoverSession(this.api);
+    user && this._setRememberHeaders(user._fromStorage);
+    return user;
   }
 
   verify(type, token, remember) {
@@ -123,7 +129,7 @@ export default class GoTrue {
   _setRememberHeaders(remember) {
     if (this.setCookie) {
       this.api.defaultHeaders = this.api.defaultHeaders || {};
-      this.api.defaultHeaders["X-Set-Cookie"] = remember ? "1" : "session";
+      this.api.defaultHeaders["X-Use-Cookie"] = remember ? "1" : "session";
     }
   }
 }
