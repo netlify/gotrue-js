@@ -37,6 +37,7 @@ export default class User {
         const api = apiInstance || new API(url, {});
         return new User(api, token, audience)._saveUserData(data, true);
       } catch (ex) {
+        console.error("Error recovering session: %o", ex);
         return null;
       }
     }
@@ -128,7 +129,7 @@ export default class User {
       this[key] = attributes[key];
     }
     if (fromStorage) {
-      user._fromStorage = true;
+      this._fromStorage = true;
     }
     return this;
   }
