@@ -3,7 +3,7 @@ import Admin from "./admin";
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = "gotrue.user";
-let refreshPromise = null;
+const refreshPromises = {};
 let currentUser = null;
 const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes = { api: 1 };
@@ -62,7 +62,7 @@ export default class User {
   jwt(forceRefresh) {
     const { expires_at, refresh_token, access_token } = this.tokenDetails();
     if (forceRefresh || expires_at - ExpiryMargin < Date.now()) {
-      return this._refreshToken();
+      return this._refreshToken(refresh_token);
     }
     return Promise.resolve(access_token);
   }
@@ -73,28 +73,27 @@ export default class User {
       .catch(this.clearSession.bind(this));
   }
 
-  _refreshToken() {
-    if (refreshPromise) {
-      return refreshPromise;
+  _refreshToken(refresh_token) {
+    if (refreshPromises[refresh_token]) {
+      return refreshPromises[refresh_token];
     }
-    refreshPromise = this.api
+    return refreshPromises[refresh_token] = this.api
       .request("/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `grant_type=refresh_token&refresh_token=${refresh_token}`
       })
       .then(response => {
-        refreshPromise = null;
+        delete refreshPromises[refresh_token];
         this._processTokenResponse(response);
         this._refreshSavedSession();
         return this.token.access_token;
       })
       .catch(error => {
-        refreshPromise = null;
+        delete refreshPromises[refresh_token];
         this.clearSession();
         return Promise.reject(error);
       });
-    return refreshPromise;
   }
 
   _request(path, options = {}) {
