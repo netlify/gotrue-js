@@ -3,7 +3,7 @@ import Admin from "./admin";
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = "gotrue.user";
-const currentRefresh = null;
+let currentRefresh = null;
 let currentUser = null;
 const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes = { api: 1 };
