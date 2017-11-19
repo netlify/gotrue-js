@@ -3,6 +3,7 @@ import Admin from "./admin";
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = "gotrue.user";
+const currentRefresh = null;
 let currentUser = null;
 const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes = { api: 1 };
@@ -61,21 +62,7 @@ export default class User {
   jwt(forceRefresh) {
     const { expires_at, refresh_token, access_token } = this.tokenDetails();
     if (forceRefresh || expires_at - ExpiryMargin < Date.now()) {
-      return this.api
-        .request("/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: `grant_type=refresh_token&refresh_token=${refresh_token}`
-        })
-        .then(response => {
-          this._processTokenResponse(response);
-          this._refreshSavedSession();
-          return this.token.access_token;
-        })
-        .catch(error => {
-          this.clearSession();
-          return Promise.reject(error);
-        });
+      return this._refreshToken();
     }
     return Promise.resolve(access_token);
   }
@@ -84,6 +71,30 @@ export default class User {
     return this._request("/logout", { method: "POST" })
       .then(this.clearSession.bind(this))
       .catch(this.clearSession.bind(this));
+  }
+
+  _refreshToken() {
+    if (currentRefresh) {
+      return currentRefresh;
+    }
+    currentRefresh = this.api
+      .request("/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `grant_type=refresh_token&refresh_token=${refresh_token}`
+      })
+      .then(response => {
+        currentRefresh = null;
+        this._processTokenResponse(response);
+        this._refreshSavedSession();
+        return this.token.access_token;
+      })
+      .catch(error => {
+        currentRefresh = null;
+        this.clearSession();
+        return Promise.reject(error);
+      });
+    return currentRefresh;
   }
 
   _request(path, options = {}) {
