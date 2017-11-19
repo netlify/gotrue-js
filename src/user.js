@@ -3,7 +3,7 @@ import Admin from "./admin";
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = "gotrue.user";
-let currentRefresh = null;
+let refreshPromise = null;
 let currentUser = null;
 const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes = { api: 1 };
@@ -74,27 +74,27 @@ export default class User {
   }
 
   _refreshToken() {
-    if (currentRefresh) {
-      return currentRefresh;
+    if (refreshPromise) {
+      return refreshPromise;
     }
-    currentRefresh = this.api
+    refreshPromise = this.api
       .request("/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `grant_type=refresh_token&refresh_token=${refresh_token}`
       })
       .then(response => {
-        currentRefresh = null;
+        refreshPromise = null;
         this._processTokenResponse(response);
         this._refreshSavedSession();
         return this.token.access_token;
       })
       .catch(error => {
-        currentRefresh = null;
+        refreshPromise = null;
         this.clearSession();
         return Promise.reject(error);
       });
-    return currentRefresh;
+    return refreshPromise;
   }
 
   _request(path, options = {}) {
