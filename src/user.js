@@ -1,4 +1,4 @@
-import API from "micro-api-client";
+import API, { JSONHTTPError } from "micro-api-client";
 import Admin from "./admin";
 
 const ExpiryMargin = 60 * 1000;
