@@ -77,7 +77,7 @@ export default class User {
     if (refreshPromises[refresh_token]) {
       return refreshPromises[refresh_token];
     }
-    return refreshPromises[refresh_token] = this.api
+    return (refreshPromises[refresh_token] = this.api
       .request("/token", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -93,7 +93,7 @@ export default class User {
         delete refreshPromises[refresh_token];
         this.clearSession();
         return Promise.reject(error);
-      });
+      }));
   }
 
   _request(path, options = {}) {
