@@ -1,4 +1,5 @@
 # GoTrue JS Client
+[![Build Status](https://travis-ci.org/netlify/gotrue-js.svg?branch=master)](https://travis-ci.org/netlify/gotrue-js)
 
 This is a JS library for [GoTrue](https://github.com/netlify/gotrue) API.
 
