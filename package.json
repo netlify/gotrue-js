@@ -36,7 +36,7 @@
     "url": "git+https://github.com/netlify/gotrue-js.git"
   },
   "scripts": {
-    "babelify": "browserify src/index.js -t [ babelify --presets [ es2015 ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/gotrue.js",
+    "babelify": "browserify src/index.js -t [ babelify --presets [ env ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/gotrue.js",
     "compile": "babel src -d lib",
     "format": "eslint . --fix && prettier --write 'src/**/*.js'",
     "prepublish": "npm run compile",
