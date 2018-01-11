@@ -5,9 +5,11 @@ const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `/.netlify/identity`;
 
 export default class GoTrue {
-  constructor(
-    { APIUrl = defaultApiURL, audience = "", setCookie = false } = {}
-  ) {
+  constructor({
+    APIUrl = defaultApiURL,
+    audience = "",
+    setCookie = false
+  } = {}) {
     if (APIUrl.match(HTTPRegexp)) {
       console.warn(
         "Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely."
@@ -18,7 +20,7 @@ export default class GoTrue {
       this.audience = audience;
     }
 
-    console.log("setCookie: %o", setCookie);
+    console.log("setCookie: %o", setCookie); // eslint-disable-line
     this.setCookie = setCookie;
 
     this.api = new API(APIUrl);
@@ -97,8 +99,9 @@ export default class GoTrue {
   }
 
   acceptInviteExternalUrl(provider, token) {
-    return `${this.api
-      .apiURL}/authorize?provider=${provider}&invite_token=${token}`;
+    return `${
+      this.api.apiURL
+    }/authorize?provider=${provider}&invite_token=${token}`;
   }
 
   createUser(tokenResponse, remember = false) {
