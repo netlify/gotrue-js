@@ -38,7 +38,7 @@ export default class User {
         const api = apiInstance || new API(url, {});
         return new User(api, token, audience)._saveUserData(data, true);
       } catch (ex) {
-        console.error("Error recovering session: %o", ex);
+        console.error(new Error(`Gotrue-js: Error recovering session: ${ex}`));
         return null;
       }
     }
@@ -146,8 +146,14 @@ export default class User {
 
   _processTokenResponse(tokenResponse) {
     this.token = tokenResponse;
-    const claims = JSON.parse(atob(tokenResponse.access_token.split(".")[1]));
-    this.token.expires_at = claims.exp * 1000;
+    let claims
+    try {
+      JSON.parse(atob(tokenResponse.access_token.split(".")[1]));
+      this.token.expires_at = claims.exp * 1000;
+    } catch (e) {
+      console.error(new Error('Gotrue-js: Failed to parse tokenResponse claims'))
+      console.error(tokenResponse)
+    }
   }
 
   _refreshSavedSession() {
