@@ -148,7 +148,7 @@ export default class User {
     this.token = tokenResponse;
     let claims
     try {
-      JSON.parse(atob(tokenResponse.access_token.split(".")[1]));
+      claims = JSON.parse(atob(tokenResponse.access_token.split(".")[1]));
       this.token.expires_at = claims.exp * 1000;
     } catch (e) {
       console.error(new Error('Gotrue-js: Failed to parse tokenResponse claims'))
