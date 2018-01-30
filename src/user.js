@@ -148,11 +148,10 @@ export default class User {
     this.token = tokenResponse;
     let claims
     try {
-      claims = JSON.parse(atob(tokenResponse.access_token.split(".")[1]));
+      claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split(".")[1]));
       this.token.expires_at = claims.exp * 1000;
     } catch (e) {
-      console.error(new Error('Gotrue-js: Failed to parse tokenResponse claims'))
-      console.error(tokenResponse)
+      console.error(new Error(`Gotrue-js: Failed to parse tokenResponse claims: ${tokenResponse}`))
     }
   }
 
@@ -188,5 +187,27 @@ export default class User {
     User.removeSavedSession();
     this.token = null;
     currentUser = null;
+  }
+}
+
+function urlBase64Decode(str) { // From https://jwt.io/js/jwt.js
+  var output = str.replace(/-/g, '+').replace(/_/g, '/');
+  switch (output.length % 4) {
+    case 0:
+      break;
+    case 2:
+      output += '==';
+      break;
+    case 3:
+      output += '=';
+      break;
+    default:
+      throw 'Illegal base64url string!';
+  }
+  var result = window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
+  try{
+    return decodeURIComponent(escape(result));
+  } catch (err) {
+    return result;
   }
 }
