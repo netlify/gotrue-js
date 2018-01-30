@@ -7,10 +7,16 @@ This is a JS client library for the [GoTrue](https://github.com/netlify/gotrue) 
 It lets you signup and authenticate users and is a building block for constructing
 the UI for signups, password recovery, login and logout.
 
+## Installation
+
+```
+yarn add gotrue-js
+```
+
 ## Usage
 
 ```js
-import GoTrue from 'gotrue-js'
+import GoTrue from 'gotrue-js'  
 
 const auth = new GoTrue();
 
