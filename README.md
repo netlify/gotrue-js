@@ -47,6 +47,7 @@ auth.recover(token).then(
 
 const user = auth.currentUser()
 
+// Users updating email requires an email confirmation step
 user.update({email: newEmail, password: newPassword}).then(
   user => console.log("Updated user"),
   error => console.log("Failed to update user: %o", error)
@@ -75,6 +76,7 @@ admin.getUser(user).then(
   error => console.log("Failed to retrieve user: %o", error)
 )
 
+// Admins updating email does not require a confirmation step
 const attributes = {email: newEmail, password: newPassword}
 admin.updateUser(user, attributes).then(
   user => console.log("Updated user: %o", user),
