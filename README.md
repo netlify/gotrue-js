@@ -1,6 +1,7 @@
 # gotrue-js
 
 [![Build Status](https://travis-ci.org/netlify/gotrue-js.svg?branch=master)](https://travis-ci.org/netlify/gotrue-js)
+[![Open Source Helpers](https://www.codetriage.com/netlify/gotrue-js/badges/users.svg)](https://www.codetriage.com/netlify/gotrue-js)
 
 This is a JS client library for the [GoTrue](https://github.com/netlify/gotrue) API.
 
