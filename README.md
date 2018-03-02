@@ -29,11 +29,13 @@ auth.confirm(token).then(
   user => console.log("Logged in as %s", user.email),
   error => console.log("Failed to log in: %o", error)
 );
+// Use `auth.confirm(token, true)` to save to localStorage
 
 auth.login(email, password).then(
   user => console.log("Logged in as %s", user.email),
   error => console.log("Failed to log in: %o", error);
 )
+// Use `auth.login(email, password, true)` to save to localStorage
 
 auth.requestPasswordRecovery(email).then(
   response => console.log("Recovery email sent"),
