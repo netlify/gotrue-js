@@ -1,5 +1,7 @@
 import API, { JSONHTTPError } from "micro-api-client";
 import Admin from "./admin";
+import storage from "./utils/storage";
+import atob from "./utils/atob";
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = "gotrue.user";
@@ -18,7 +20,7 @@ export default class User {
   }
 
   static removeSavedSession() {
-    localStorage.removeItem(storageKey);
+    storage.removeItem(storageKey);
   }
 
   static recoverSession(apiInstance) {
@@ -26,7 +28,7 @@ export default class User {
       return currentUser;
     }
 
-    const json = localStorage.getItem(storageKey);
+    const json = storage.getItem(storageKey);
     if (json) {
       try {
         const data = JSON.parse(json);
@@ -157,7 +159,7 @@ export default class User {
 
   _refreshSavedSession() {
     // only update saved session if we previously saved something
-    if (localStorage.getItem(storageKey)) {
+    if (storage.getItem(storageKey)) {
       this._saveSession();
     }
     return this;
@@ -175,7 +177,7 @@ export default class User {
   }
 
   _saveSession() {
-    localStorage.setItem(storageKey, JSON.stringify(this._details));
+    storage.setItem(storageKey, JSON.stringify(this._details));
     return this;
   }
 
@@ -204,7 +206,7 @@ function urlBase64Decode(str) { // From https://jwt.io/js/jwt.js
     default:
       throw 'Illegal base64url string!';
   }
-  var result = window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
+  var result = atob(output); //polifyll https://github.com/davidchambers/Base64.js
   try{
     return decodeURIComponent(escape(result));
   } catch (err) {

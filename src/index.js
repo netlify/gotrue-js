@@ -1,3 +1,7 @@
+/* Fetch polyfill for node and old browsers ; should be moved into micro-api-client */
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
+
 import API, { JSONHTTPError } from "micro-api-client";
 import User from "./user";
 

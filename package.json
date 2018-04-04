@@ -5,6 +5,9 @@
   "author": "Mathias Biilmann Christensen",
   "bugs": "https://github.com/netlify/micro-api-client-lib/issues",
   "dependencies": {
+    "es6-promise": "^4.2.4",
+    "isomorphic-base64": "^1.0.2",
+    "isomorphic-fetch": "^2.2.1",
     "micro-api-client": "^3.2.1"
   },
   "devDependencies": {
