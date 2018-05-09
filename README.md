@@ -17,16 +17,16 @@ yarn add gotrue-js
 
 ## Usage
 
-```
-import GoTrue from "gotrue-js"
+```js
+import GoTrue from "gotrue-js";
 
 // Instantiate the GoTrue auth client with an optional configuration
 
 auth = new GoTrue({
-  APIUrl: 'https://<your domain name>/.netlify/identity',
+  APIUrl: "https://<your domain name>/.netlify/identity",
   audience: "", // Set the X-JWT-AUD header
   setCookie: false
-})
+});
 ```
 
 ### GoTrue configuration
@@ -47,18 +47,19 @@ If an error occurs during the request, the promise may be rejected with an Error
 
 Create a new user with the provided email and password.
 
-```
-auth.signup(email, password)
+```js
+auth.signup(email, password);
 ```
 
 Returns a promise that contains a response object. Check the inbox of the email address you used in this example, you should expect to see a confirmation email sent by Netlify.
 
 Example usage:
 
-```
-auth.signup(email, password)
+```js
+auth
+  .signup(email, password)
   .then(response => console.log("Confirmation email sent", response))
-  .catch(error => console.log("It's an error",error));
+  .catch(error => console.log("It's an error", error));
 ```
 
 Example response object:
@@ -93,7 +94,7 @@ For security reason, the token is hidden from the browser via redirect.
 
 You can run `curl` to get the token in command line. E.g.,
 
-```
+```js
 {curl -I https://example.netlify.com?p=<example query>
 ...
 Location: https://example.netlify.com/#confirmation_token=<example token>
@@ -108,7 +109,7 @@ Note that you'll need to test out this method in the browser instead of using a 
 
 Example response object:
 
-```
+```js
 api: Object { apiURL: "https://example.netlify.com/.netlify/identity", \_sameOrigin: true, defaultHeaders: {} }
 app_metadata: Object { provider: "email" }
 aud: ""
@@ -133,11 +134,11 @@ Handles user login.
 
 Example usage:
 
-```
+```js
 auth
   .login(email, password)
   .then(user => console.log("Logged in as %s", user, user.email))
-  .catch(error => console.log("Failed to log in: %o", error))
+  .catch(error => console.log("Failed to log in: %o", error));
 ```
 
 Example response object:
@@ -151,7 +152,7 @@ This function sends an email to the specified email address with a link the user
 
 Example usage:
 
-```
+```js
 auth
   .requestPasswordRecovery(email)
   .then(response => console.log("Recovery email sent"))
@@ -167,7 +168,7 @@ Example response object:
 
 Example usage:
 
-```
+```js
 auth
   .recover(token)
   .then(response => console.log("Logged in as %s", response))
@@ -188,7 +189,7 @@ const user = auth.currentUser()
 
 Example response object:
 
-```
+```js
 {
   "api": {
     "apiURL": "https://example.netlify.com/.netlify/identity",
@@ -225,21 +226,21 @@ This function updates the user object with specified attributes.
 
 Example usage:
 
-```
+```js
 const user = auth.currentUser();
 
 user
-.update({ email: "example@example.com", password: "password" })
-.then(user => console.log("Updated user %s", user))
-.catch(error => {
-console.log("Failed to update user: %o", error);
-throw error;
-});
+  .update({ email: "example@example.com", password: "password" })
+  .then(user => console.log("Updated user %s", user))
+  .catch(error => {
+    console.log("Failed to update user: %o", error);
+    throw error;
+  });
 ```
 
 Example response object:
 
-```
+```js
 {
   "api": {
     "apiURL": "https://example.netlify.com/.netlify/identity",
@@ -278,15 +279,14 @@ This function returns the JWT token of a user object.
 
 Example usage:
 
-```
+```js
 const jwt = user.jwt();
 jwt
   .then(response => console.log("This is a JWT token", response))
-  .catch(error =>
-    {
-      console.log("Error fetching JWT token", error);
-      throw error;
-    });
+  .catch(error => {
+    console.log("Error fetching JWT token", error);
+    throw error;
+  });
 ```
 
 Example response object:
@@ -303,7 +303,7 @@ This function handles log out.
 
 Example usage:
 
-```
+```js
 const user = auth.currentUser();
 user
   .logout()
@@ -318,35 +318,94 @@ user
 
 The following admin methods are currently not available to be used directly. You can access `context.clientContext.identity` and get a short lived admin token through a Lambda function and achieve the same goals as the admin methods, e.g., update user role, create or delete user etc. See [Identity and Functions](https://www.netlify.com/docs/functions/#identity-and-functions) for more info.
 
+Let's create a simple form using HTML and JavaScript to interact with a lambda function to test out the admin calls.
+
+1. Create an HTML form for user log in
+
+```html
+<h2>Log in</h2>
+<form name="login">
+  <div class="message"></div>
+  <p>
+    <label>Email<br/><input type="email" name="email" required/></label>
+  </p>
+  <p>
+    <label>Password<br/><input type="password" name="password" required/></label>
+  </p>
+  <button type="submit">Log in</button>
+</form>
+```
+
+2. Invoke lambda function in JavaScript. In this example we named our function `hello.js`.
+
+```js
+document.querySelector("form[name='login']").addEventListener("submit", e => {
+  e.preventDefault();
+  const form = e.target;
+  const { email, password } = form.elements;
+  auth
+    .login(email.value, password.value)
+    .then(response => {
+      const myAuthHeader = "Bearer " + response.token.access_token; //creates the bearer token
+      console.log({ myAuthHeader });
+      fetch("/.netlify/functions/hello", {
+        headers: { Authorization: myAuthHeader },
+        credentials: "include"
+      })
+        .then(response => {
+          console.log({ response });
+        })
+        .catch(error => {...});
+    })
+    .catch(error => {...});
+});
+```
+
 ### Get a user
 
 This function returns a user object with the given user id.
-`admin.getUser(userObject)`
+
+```js
+getUser(user) {
+    return this.user.\_request(`/admin/users/${user.id}`);
+}
+```
 
 Example usage:
 
-```
-const user = { id: 1234 }
-admin.getUser(user).then(
-user => console.log("User object: %o", user),
-error => console.log("Failed to retrieve user: %o", error)
-)
+```js
+2:11:41 PM Got a user! 204!
+2:11:41 PM { response:
+Response {
+size: 0,
+timeout: 0,
+[Symbol(Body internals)]: { body: [Object], disturbed: false, error: null },
+[Symbol(Response internals)]:
+{ url: 'https://example.com/.netlify/identity/admin/users/exampleuserid',
+status: 200,
+statusText: 'OK',
+headers: [Object] } } }
 ```
 
 Example response object:
 
 ### Update a user
 
-This function updates the an user with the given attributes.
+This function updates the an existing user with the given attributes.
 
-`admin.updateUser(userObject, attributes)`
+```js
+updateUser(user, attributes = {}) {
+   return this.user._request(`/admin/users/${user.id}`, {
+     method: "PUT",
+     body: JSON.stringify(attributes)
+   });
+}
+```
 
 Example usage:
 
-Lambda Function example code:
-
-```
-import fetch from "node-fetch"; // Same as fetch = require("node-fetch").default;
+```js
+import fetch from "node-fetch";
 
 exports.handler = async (event, context) => {
 const { identity, user } = context.clientContext;
@@ -355,138 +414,180 @@ const userUrl = `${identity.url}/admin/users/${userID}`;
 const adminAuthHeader = "Bearer " + identity.token;
 
 try {
-fetch(userUrl, {
-method: "PUT",
-headers: { Authorization: adminAuthHeader },
-body: JSON.stringify({ app_metadata: { roles: ["admin"] } })
-})
-.then(response => {
-console.log("Updated a user role! 204!");
-return { statusCode: 204 };
-})
-.catch(e => {
-console.log("Failed to update a user role! 500! Internal.");
-return {
-statusCode: 500,
-body: "Internal Server Error: " + e
+  fetch(userUrl, {
+    method: "PUT",
+    headers: { Authorization: adminAuthHeader },
+    body: JSON.stringify({ app_metadata: { roles: ["admin"] } })
+    })
+    .then(response => {...})
+    .catch(e => {...});
+} catch (e) {...}
 };
-});
-} catch (e) {
-console.log("GOT HERE! 500! outer");
-return { statusCode: 500, body: "Internal Server Error: " + e };
-}
-};
-```
-
-Front end example code
-
-```
-import GoTrue from "gotrue-js";
-
-const auth = new GoTrue({
-APIUrl: "https://example.netlify.com/.netlify/identity"
-});
-
-document.querySelector("form[name='login']").addEventListener("submit", e => {
-e.preventDefault();
-const form = e.target;
-const { email, password } = form.elements;
-auth
-.login(email.value, password.value)
-.then(response => {
-const myAuthHeader = "Bearer " + response.token.access_token; //creates the bearer token
-fetch("/.netlify/functions/lambda", {
-headers: { Authorization: myAuthHeader },
-credentials: "include"
-})
-.then(response => {
-console.log({ response });
-})
-.catch(error => console.error("Error:", error));
-})
-.catch(error => showMessage("Failed :( " + JSON.stringify(error), form));
-});
 ```
 
 Example response object:
 
-```
+```js
 [
-	{
-		"api": {
-			"apiURL": "https://example.netlify.com/.netlify/identity",
-			"_sameOrigin": true,
-			"defaultHeaders": {}
-		},
-		"url": "https://example.netlify.com/.netlify/identity",
-		"token": {
-			"access_token": "example-token",
-			"token_type": "bearer",
-			"expires_in": 3600,
-			"refresh_token": "c6oZhHPKyNQC3RbytoNjDg",
-			"expires_at": 1525851876000
-		},
-		"id": "example-id",
-		"aud": "",
-		"role": "",
-		"email": "example@example.com",
-		"confirmed_at": "2018-05-04T23:57:17Z",
-		"app_metadata": {
-			"provider": "email",
-			"roles": [
-				"admin"
-			]
-		},
-		"user_metadata": {},
-		"created_at": "2018-05-04T23:57:17Z",
-		"updated_at": "2018-05-04T23:57:17Z"
-	},
-	"Bearer <example-token>"
-]
+  {
+    api: {
+      apiURL: "https://example.netlify.com/.netlify/identity",
+      _sameOrigin: true,
+      defaultHeaders: {}
+    },
+    url: "https://example.netlify.com/.netlify/identity",
+    token: {
+      access_token: "example-token",
+      token_type: "bearer",
+      expires_in: 3600,
+      refresh_token: "c6oZhHPKyNQC3RbytoNjDg",
+      expires_at: 1525851876000
+    },
+    id: "example-id",
+    aud: "",
+    role: "",
+    email: "example@example.com",
+    confirmed_at: "2018-05-04T23:57:17Z",
+    app_metadata: {
+      provider: "email",
+      roles: ["admin"]
+    },
+    user_metadata: {},
+    created_at: "2018-05-04T23:57:17Z",
+    updated_at: "2018-05-04T23:57:17Z"
+  },
+  "Bearer <example-token>"
+];
 ```
 
 ### Create a new user
 
 This function creates a new user object with the new email and password and other optional attributes.
 
-`admin.createUser(email, password, [attributes])`
+```js
+createUser(email, password, attributes = {}) {
+    attributes.email = email;
+    attributes.password = password;
+    return this.user.\_request("/admin/users", {
+    method: "POST",
+    body: JSON.stringify(attributes)
+    });
+  }
+```
 
 Example usage:
 
-```
-admin.createUser(email, password, attributes = {}).then(
-user => console.log("Created user user: %o", user),
-error => console.log("Failed to create user: %o", error)
-)
+```js
+import fetch from "node-fetch";
+
+exports.handler = async (event, context) => {
+  const { identity, user } = context.clientContext;
+  console.log({ identity, user });
+  const userID = user.sub;
+  const usersUrl = `${identity.url}/admin/users`;
+  const adminAuthHeader = "Bearer " + identity.token;
+
+  try {
+  return fetch(usersUrl, {
+  method: "POST",
+  headers: { Authorization: adminAuthHeader },
+  body: JSON.stringify({ email: "example@netlify.com", password: "gotrue" })
+  })
+  .then(response => {
+  console.log("Created a user! 204!");
+  console.log({ response });
+  return { statusCode: 204 };
+  })
+  .catch(e => {...});
+  } catch (e) {...}
+};
 ```
 
 Example response object:
+
+```js
+11:14:51 AM Created a user! 204!
+11:14:51 AM { response:
+Response {
+size: 0,
+timeout: 0,
+[Symbol(Body internals)]: { body: [Object], disturbed: false, error: null },
+[Symbol(Response internals)]:
+{ url: 'https://example.netlify/identity/admin/users',
+status: 200,
+statusText: 'OK',
+headers: [Object] } } }
+```
 
 ### Delete a user
 
-This function deletes an existing user.
-`admin.deleteUser(userObject)`
+This function deletes an existing user object.
+
+```js
+deleteUser(user) {
+return this.user.\_request(`/admin/users/${user.id}`, {
+method: "DELETE"
+});
+}
+```
 
 Example usage:
 
-```
-admin.deleteUser(user).then(
-user => console.log("Deleted user user: %o", user),
-error => console.log("Failed to delete user: %o", error)
-)
+```js
+exports.handler = async (event, context) => {
+const { identity, user } = context.clientContext;
+console.log({ identity, user });
+const userID = user.sub;
+const userUrl = `${identity.url}/admin/users/{${userID}}`;
+const adminAuthHeader = "Bearer " + identity.token;
+
+try {
+return fetch(userUrl, {
+method: "DELETE",
+headers: { Authorization: adminAuthHeader }
+})
+.then(response => {
+console.log("Deleted a user! 204!");
+console.log({ response });
+return { statusCode: 204 };
+})
+.catch(e => {...});
+} catch (e) {...}
+};
 ```
 
 Example response object:
 
+```
+11:58:01 AM Deleted a user! 204!
+11:58:01 AM { response:
+Response {
+size: 0,
+timeout: 0,
+[Symbol(Body internals)]: { body: [Object], disturbed: false, error: null },
+[Symbol(Response internals)]:
+{ url: 'https://example.netlify.com/.netlify/identity/admin/users/exampleuserid',
+status: 200,
+statusText: 'OK',
+headers: [Object] } } }
+```
+
 ### Get a list of users
 
-This function returns a list of users under the particular site with the given audience.
+This function returns a list of users with the condition that the users are linked to the specified audience.
 
-`admin.list(audience)`
+```js
+listUsers(aud) {
+    return this.user._request("/admin/users", {
+      method: "GET",
+      audience: aud
+    });
+}
+```
 
 Example usage:
 
-```
+```js
 const admin = user.admin;
 admin.listUsers(audience)
 .then(
