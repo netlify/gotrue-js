@@ -1,4 +1,4 @@
-# gotrue-js
+# gotrue-js library
 
 [![Build Status](https://travis-ci.org/netlify/gotrue-js.svg?branch=master)](https://travis-ci.org/netlify/gotrue-js)
 
@@ -7,7 +7,7 @@ This is a JavaScript client library for the [GoTrue](https://github.com/netlify/
 It lets you create and authenticate users and is a building block for constructing
 the UI for signups, password recovery, login and logout.
 
-Notice that any methods that require dealing with browser only features, such as `localStorage` or `window object` need to be tested in the browser instead of in the REPL.
+Play around the methods via the [demo site](https://lunaceee-gotruejs.netlify.com/).
 
 ## Installation
 
@@ -31,17 +31,17 @@ auth = new GoTrue({
 
 ### GoTrue configuration
 
-APIUrl: The absolute path of the GoTrue endpoint. To find the `APIUrl`, go to `Identity` page in your Netlify site dashboard.
+APIUrl: The absolute path of the GoTrue endpoint. To find the `APIUrl`, go to `Identity` page of your Netlify site dashboard.
 
-audience(optional): `audience` is one of the pre-defined [JWT payload](https://tools.ietf.org/html/rfc7519#section-4.1.3) claims. If you were hosting your own identity service and wanted to support [multitenancy](https://en.wikipedia.org/wiki/Multitenancy), you would need `audience` to separate the users. Otherwise just leave it empty by default.
+audience(optional): `audience` is one of the pre-defined [JWT payload](https://tools.ietf.org/html/rfc7519#section-4.1.3) claims. It's an optional attribute which is set to be empty by default. If you were hosting your own identity service and wanted to support [multitenancy](https://en.wikipedia.org/wiki/Multitenancy), you would need `audience` to separate the users.
 
-setCookie(optional): `false` by default. If you wish to use the `remember me` functionality, set the value to be `true`.
+setCookie(optional): set to be `false` by default. If you wish to implement the `remember me` functionality, set the value to be `true`.
 
 ### Error handling
 
 If an error occurs during the request, the promise may be rejected with an Error, `HTTPError`, `TextHTTPError`, or `JSONHTTPError`. See [micro-api-client-lib error types](https://github.com/netlify/micro-api-client-lib#class-httperror-extends-error).
 
-## Authentication methods
+## Authentication examples
 
 ### Create a new user
 
@@ -78,9 +78,9 @@ Example response object:
 
 Also, make sure the `Registration preferences` under `Identity settings` in your Netlify dashboard are set to `Open`.
 
-[registration preferences](./src/images/identity-settings-registration.png)
+![registration preferences](https://github.com/netlify/gotrue-js/blob/update-readme/src/images/identity-settings-registration.png, "registration preferences")
 
-If the registration preferences is set to be `Invite only`, you'll get an error message as follows:
+If the registration preferences is set to be `Invite only`, you'll get an error message like this:
 `{code: 403, msg: 'Signups not allowed for this instance'}`
 
 ### Confirm a new user signup
@@ -94,18 +94,25 @@ auth.confirm(token);
 When a new user signed up, a confirmation email will be sent to the user if `Autoconfirm` isn't turned on under the [identity settings](https://www.netlify.com/docs/identity/#adding-users).
 
 In the email, there's a link that says "Confirm your email address".
-When a user clicks on the link, it'll be redirected to the site of the site with a fragment identifier that looks like `#confirmation_token=Iyo9xHvsGVbW-9A9v4sDmQ`.
+When a user clicks on the link, it'll be redirected to the site with a [fragment identifier](https://en.wikipedia.org/wiki/Fragment_identifier) `#confirmation_token=Iyo9xHvsGVbW-9A9v4sDmQ` in the URL.
 
-For security reason, the `confirmation_token` is hidden from the browser via a redirect.
+For all good reasons, the `confirmation_token` is hidden from the browser via a redirect.
 
 If you wish to manually confirm a user using the `auth.confirm(token)` method,
-you can copy the link location of the email and use the `curl` script to get the confirmation token in your terminal. E.g.,
+you can copy the link location of the email and use the `curl -I` script to get the `confirmation_token` from your terminal. E.g.,
 
-```js
-{curl -I "link from confirmation email"
-...
-Location: https://example.netlify.com/#confirmation_token="example-token"
-}
+```
+$ curl -I https://mandrillapp.com/track/click/30002868/example.netlify.com?p=example-token
+  HTTP/1.1 302 Moved Temporarily
+  Server: nginx/1.12.2
+  Date: Tue, 15 May 2018 21:19:13 GMT
+  Content-Type: text/html; charset=utf-8
+  Set-Cookie: PHPSESSID=77c421bf85fa412e5f994f28a6b30956; expires=Wed, 16-May-2018 07:19:13 GMT; path=/; secure; HttpOnly
+  Expires: Thu, 19 Nov 1981 08:52:00 GMT
+  Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+  Pragma: no-cache
+  Set-Cookie: PHPSESSID=77c421bf85fa412e5f994f28a6b30956; expires=Wed, 16-May-2018 07:19:13 GMT; path=/; secure; httponly
+  Location: https://example.netlify.com/#confirmation_token=Iyo9xHvsGVbW-9A9v4sDmQ
 ```
 
 Example usage:
@@ -121,39 +128,39 @@ auth
   });
 ```
 
-This method requires usage of browser `local storage`. Test the usage in the front end vs node REPL.
+_This method requires usage of browser window object `localStorage`. Test the usage in your front end code._
 
 Example response object:
 
 ```js
 {
-	"response": {
-		"api": {
-			"apiURL": "https://inspiring-ride-d3b2ae.netlify.com/.netlify/identity",
-			"_sameOrigin": true,
-			"defaultHeaders": {}
-		},
-		"url": "https://inspiring-ride-d3b2ae.netlify.com/.netlify/identity",
-		"token": {
-			"access_token": "example-jwt-token",
-			"token_type": "bearer",
-			"expires_in": 3600,
-			"refresh_token": "rRbzn5kppCr09Fd5FX9uxg",
-			"expires_at": 1526110512000
-		},
-		"id": "example-id",
-		"aud": "",
-		"role": "",
-		"email": "example@netlify.com",
-		"confirmed_at": "2018-05-12T06:35:13Z",
-		"confirmation_sent_at": "2018-05-12T06:34:35Z",
-		"app_metadata": {
-			"provider": "email"
-		},
-		"user_metadata": {},
-		"created_at": "2018-05-12T06:34:35Z",
-		"updated_at": "2018-05-12T06:34:35Z"
-	}
+  "response": {
+    "api": {
+      "apiURL": "https://example.netlify.com/.netlify/identity",
+      "_sameOrigin": true,
+      "defaultHeaders": {}
+    },
+    "url": "https://example.netlify.com/.netlify/identity",
+    "token": {
+      "access_token": "example-jwt-token",
+      "token_type": "bearer",
+      "expires_in": 3600,
+      "refresh_token": "example-refresh_token",
+      "expires_at": 1526110512000
+    },
+    "id": "example-id",
+    "aud": "",
+    "role": "",
+    "email": "example@netlify.com",
+    "confirmed_at": "2018-05-12T06:35:13Z",
+    "confirmation_sent_at": "2018-05-12T06:34:35Z",
+    "app_metadata": {
+      "provider": "email"
+    },
+    "user_metadata": {},
+    "created_at": "2018-05-12T06:34:35Z",
+    "updated_at": "2018-05-12T06:34:35Z"
+  }
 }
 ```
 
@@ -178,38 +185,39 @@ Example response object:
 
 ```js
 {
-	"response": {
-		"api": {
-			"apiURL": "https://inspiring-ride-d3b2ae.netlify.com/.netlify/identity",
-			"_sameOrigin": true,
-			"defaultHeaders": {}
-		},
-		"url": "https://example.netlify.com/.netlify/identity",
-		"token": {
-			"access_token": "example-token",
-			"token_type": "bearer",
-			"expires_in": 3600,
-			"refresh_token": "S6gbTG9u9Yn51zvjP9pgWA",
-			"expires_at": 1526062471000
-		},
-		"id": "example-id",
-		"aud": "",
-		"role": "",
-		"email": "example@netlify.com",
-		"confirmed_at": "2018-05-04T23:57:17Z",
-		"app_metadata": {
-			"provider": "email"
-		},
-		"user_metadata": {},
-		"created_at": "2018-05-04T23:57:17Z",
-		"updated_at": "2018-05-04T23:57:17Z"
-	}
+  "response": {
+    "api": {
+      "apiURL": "https://example.netlify.com/.netlify/identity",
+      "_sameOrigin": true,
+      "defaultHeaders": {}
+    },
+    "url": "https://example.netlify.com/.netlify/identity",
+    "token": {
+      "access_token": "example-jwt-token",
+      "token_type": "bearer",
+      "expires_in": 3600,
+      "refresh_token": "example-refresh_token",
+      "expires_at": 1526062471000
+    },
+    "id": "example-id",
+    "aud": "",
+    "role": "",
+    "email": "example@netlify.com",
+    "confirmed_at": "2018-05-04T23:57:17Z",
+    "app_metadata": {
+      "provider": "email"
+    },
+    "user_metadata": {},
+    "created_at": "2018-05-04T23:57:17Z",
+    "updated_at": "2018-05-04T23:57:17Z"
+  }
 }
 ```
 
 ### Request password recover email
 
-This function sends a request to GoTrue to trigger a password recovery email to the specified email address
+This function sends a request to GoTrue API and triggers a password recovery email to the specified email address.
+Similar to `confirmation_token`, the `recovery_token` is baked in the link of the email. You can also copy the link location from the email and run `curl -I` in the command line to grab the token.
 
 `auth.requestPasswordRecovery(email)`
 
@@ -244,36 +252,36 @@ auth
 
 Example response object:
 
-```
+```js
 {
-	"response": {
-		"api": {
-			"apiURL": "https://example.netlify.com/.netlify/identity",
-			"_sameOrigin": true,
-			"defaultHeaders": {}
-		},
-		"url": "https://inspiring-ride-d3b2ae.netlify.com/.netlify/identity",
-		"token": {
-			"access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjYxMDc3MjksInN1YiI6ImYzMDI3N2Y0LTFmNTItNGUxNC04YWQ3LWRmOTM2NDMwNjY4ZiIsImVtYWlsIjoibHVuYStpZGVudGl0eUBuZXRsaWZ5LmNvbSIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIn0sInVzZXJfbWV0YWRhdGEiOnt9fQ.VUl3vycbfY0Cg_mcYuLhkE__ZMOzL85WeCBtEDCg_aA",
-			"token_type": "bearer",
-			"expires_in": 3600,
-			"refresh_token": "juYQ1F-CHm6Xv9ondE_-pA",
-			"expires_at": 1526107729000
-		},
-		"id": "example-id",
-		"aud": "",
-		"role": "",
-		"email": "example@netlify.com",
-		"confirmed_at": "2018-05-12T05:48:49Z",
-		"invited_at": "2018-05-04T23:40:00Z",
-		"recovery_sent_at": "2018-05-12T05:48:13Z",
-		"app_metadata": {
-			"provider": "email"
-		},
-		"user_metadata": {},
-		"created_at": "2018-05-04T23:40:00Z",
-		"updated_at": "2018-05-04T23:40:00Z"
-	}
+  "response": {
+    "api": {
+      "apiURL": "https://example.netlify.com/.netlify/identity",
+      "_sameOrigin": true,
+      "defaultHeaders": {}
+    },
+    "url": "https://example.netlify.com/.netlify/identity",
+    "token": {
+      "access_token": "example-jwt-token",
+      "token_type": "bearer",
+      "expires_in": 3600,
+      "refresh_token": "example-refresh_token",
+      "expires_at": 1526107729000
+    },
+    "id": "example-id",
+    "aud": "",
+    "role": "",
+    "email": "example@netlify.com",
+    "confirmed_at": "2018-05-12T05:48:49Z",
+    "invited_at": "2018-05-04T23:40:00Z",
+    "recovery_sent_at": "2018-05-12T05:48:13Z",
+    "app_metadata": {
+      "provider": "email"
+    },
+    "user_metadata": {},
+    "created_at": "2018-05-04T23:40:00Z",
+    "updated_at": "2018-05-04T23:40:00Z"
+  }
 }
 ```
 
@@ -300,10 +308,10 @@ Example response object:
   },
   "url": "https://example.netlify.com/.netlify/identity",
   "token": {
-    "access_token": "example-token",
+    "access_token": "example-jwt-token",
     "token_type": "bearer",
     "expires_in": 3600,
-    "refresh_token": "v4w7HfB4xfeKW9m8tg",
+    "refresh_token": "example-refresh_token",
     "expires_at": 1525214326000
   },
   "id": "example-id",
@@ -351,10 +359,10 @@ Example response object:
   },
   "url": "https://example.netlify.com/.netlify/identity",
   "token": {
-    "access_token": "example-token",
+    "access_token": "example-jwt-token",
     "token_type": "bearer",
     "expires_in": 3600,
-    "refresh_token": "dSkuYfmkph-mxUVtOA5k_Q",
+    "refresh_token": "example-refresh_token",
     "expires_at": 1525215471000
   },
   "id": "example-id",
@@ -382,6 +390,7 @@ This function retrieves a JWT token from a currently logged in user
 Example usage:
 
 ```js
+const user = auth.currentUser();
 const jwt = user.jwt();
 jwt
   .then(response => console.log("This is a JWT token", response))
@@ -399,7 +408,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUyMTk4MTYsInN1YiI6ImE5NG.98YD
 
 ### Logout a user
 
-This function sends a POST request to the `/logout` endpoint and clears the session of the current user
+This function removes the current session of the user and log out the user
 
 `user.logout()`
 
@@ -418,7 +427,7 @@ user
 
 ## Admin methods
 
-The following admin methods are currently not available to be used directly. You can access `context.clientContext.identity` and get a short lived admin token through a Lambda function and achieve the same goals as the admin methods, e.g., update user role, create or delete user etc. See [Identity and Functions](https://www.netlify.com/docs/functions/#identity-and-functions) for more info.
+The following admin methods are currently not available to be used directly. You can access `context.clientContext.identity` and get a short lived admin token through a Lambda function and achieve the same goals, e.g., update user role, create or delete user etc. See [Identity and Functions](https://www.netlify.com/docs/functions/#identity-and-functions) for more info.
 
 Let's create a simple login form in HTML and JavaScript to interact with a lambda function and test out the admin methods.
 
@@ -438,7 +447,7 @@ Let's create a simple login form in HTML and JavaScript to interact with a lambd
 </form>
 ```
 
-2. Invoke lambda function in JavaScript. In this example we named our function `hello.js`
+2. Invoke lambda function. (In this example our function is names as `hello.js`)
 
 ```js
 document.querySelector("form[name='login']").addEventListener("submit", e => {
@@ -514,17 +523,17 @@ Example response object:
 
 ```js
 {
-	"id": "example-id",
-	"aud": "",
-	"role": "",
-	"email": "example@netlify.com",
-	"confirmed_at": "2018-05-09T06:28:46Z",
-	"app_metadata": {
-		"provider": "email"
-	},
-	"user_metadata": {},
-	"created_at": "2018-05-09T06:28:46Z",
-	"updated_at": "2018-05-09T06:28:46Z"
+  "id": "example-id",
+  "aud": "",
+  "role": "",
+  "email": "example@netlify.com",
+  "confirmed_at": "2018-05-09T06:28:46Z",
+  "app_metadata": {
+    "provider": "email"
+  },
+  "user_metadata": {},
+  "created_at": "2018-05-09T06:28:46Z",
+  "updated_at": "2018-05-09T06:28:46Z"
 }
 ```
 
@@ -575,22 +584,22 @@ Example response object:
 
 ```js
 {
-	"data": {
-		"id": "example-id",
-		"aud": "",
-		"role": "",
-		"email": "example@netlify.com",
-		"confirmed_at": "2018-05-09T06:52:58Z",
-		"app_metadata": {
-			"provider": "email",
-			"roles": [
-				"superstar"
-			]
-		},
-		"user_metadata": {},
-		"created_at": "2018-05-09T06:52:58Z",
-		"updated_at": "2018-05-11T00:26:27.668465915Z"
-	}
+  "data": {
+    "id": "example-id",
+    "aud": "",
+    "role": "",
+    "email": "example@netlify.com",
+    "confirmed_at": "2018-05-09T06:52:58Z",
+    "app_metadata": {
+      "provider": "email",
+      "roles": [
+        "superstar"
+      ]
+    },
+    "user_metadata": {},
+    "created_at": "2018-05-09T06:52:58Z",
+    "updated_at": "2018-05-11T00:26:27.668465915Z"
+  }
 }
 ```
 
@@ -646,18 +655,18 @@ Example response object:
 
 ```js
 {
-	"data": {
-		"id": "new-id",
-		"aud": "",
-		"role": "",
-		"email": "new-email@netlify.com",
-		"app_metadata": {
-			"provider": "email"
-		},
-		"user_metadata": null,
-		"created_at": "2018-05-11T00:37:34.475713996Z",
-		"updated_at": "2018-05-11T00:37:34.481743781Z"
-	}
+  "data": {
+    "id": "new-id",
+    "aud": "",
+    "role": "",
+    "email": "new-email@netlify.com",
+    "app_metadata": {
+      "provider": "email"
+    },
+    "user_metadata": null,
+    "created_at": "2018-05-11T00:37:34.475713996Z",
+    "updated_at": "2018-05-11T00:37:34.481743781Z"
+  }
 }
 ```
 
@@ -766,50 +775,50 @@ Example response object:
 
 ```js
 {
-	"aud": "",
-	"users": [
-		{
-			"id": "example-id-01",
-			"aud": "",
-			"role": "",
-			"email": "example-email-01@netlify.com",
-			"app_metadata": {
-				"provider": "email"
-			},
-			"user_metadata": {},
-			"created_at": "2018-05-09T18:14:51Z",
-			"updated_at": "2018-05-09T18:14:51Z"
-		},
-		{
-			"id": "example-id-02",
-			"aud": "",
-			"role": "",
-			"email": "example-email-02@netlify.com",
-			"confirmed_at": "2018-05-09T06:52:58Z",
-			"app_metadata": {
-				"provider": "email"
-			},
-			"user_metadata": {},
-			"created_at": "2018-05-09T06:52:58Z",
-			"updated_at": "2018-05-09T06:52:58Z"
-		},
-		{
-			"id": "example-id-03",
-			"aud": "",
-			"role": "",
-			"email": "example-email-03@netlify.com",
-			"confirmed_at": "2018-05-09T06:28:46Z",
-			"app_metadata": {
-				"provider": "email",
-				"roles": [
-					"admin"
-				]
-			},
-			"user_metadata": {},
-			"created_at": "2018-05-09T06:28:46Z",
-			"updated_at": "2018-05-09T06:28:46Z"
-		}
-	]
+  "aud": "",
+  "users": [
+    {
+      "id": "example-id-01",
+      "aud": "",
+      "role": "",
+      "email": "example-email-01@netlify.com",
+      "app_metadata": {
+        "provider": "email"
+      },
+      "user_metadata": {},
+      "created_at": "2018-05-09T18:14:51Z",
+      "updated_at": "2018-05-09T18:14:51Z"
+    },
+    {
+      "id": "example-id-02",
+      "aud": "",
+      "role": "",
+      "email": "example-email-02@netlify.com",
+      "confirmed_at": "2018-05-09T06:52:58Z",
+      "app_metadata": {
+        "provider": "email"
+      },
+      "user_metadata": {},
+      "created_at": "2018-05-09T06:52:58Z",
+      "updated_at": "2018-05-09T06:52:58Z"
+    },
+    {
+      "id": "example-id-03",
+      "aud": "",
+      "role": "",
+      "email": "example-email-03@netlify.com",
+      "confirmed_at": "2018-05-09T06:28:46Z",
+      "app_metadata": {
+        "provider": "email",
+        "roles": [
+          "admin"
+        ]
+      },
+      "user_metadata": {},
+      "created_at": "2018-05-09T06:28:46Z",
+      "updated_at": "2018-05-09T06:28:46Z"
+    }
+  ]
 }
 ```
 
