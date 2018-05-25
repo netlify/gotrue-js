@@ -458,7 +458,6 @@ document.querySelector("form[name='login']").addEventListener("submit", e => {
     .login(email.value, password.value)
     .then(response => {
       const myAuthHeader = "Bearer " + response.token.access_token; //creates the bearer token
-      console.log({ myAuthHeader });
       fetch("/.netlify/functions/hello", {
         headers: { Authorization: myAuthHeader },
         credentials: "include"
@@ -600,6 +599,62 @@ Example response object:
     "created_at": "2018-05-09T06:52:58Z",
     "updated_at": "2018-05-11T00:26:27.668465915Z"
   }
+}
+```
+
+### Invite a user
+
+To invite a user using the admin token, do a `POST` request to `/invite` endpoint.
+
+Example usage:
+
+```js
+import fetch from 'node-fetch';
+
+exports.handler = async (event, context) => {
+  const { identity } = context.clientContext;
+  const inviteUrl = `${identity.url}/invite`;
+  const adminAuthHeader = "Bearer " + identity.token;
+
+    try {
+      return fetch(inviteUrl, {
+        method: "POST",
+        headers: { Authorization: adminAuthHeader },
+        body: JSON.stringify({ email: "example@example.com" })
+      })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        console.log("Invited a user! 204!");
+        console.log(JSON.stringify({ data }));
+        return { statusCode: 204 };
+      })
+      .catch(e => return {...});
+  } catch (e) { return e; };
+};
+```
+
+Example response:
+
+```js
+{
+  "id": "example-id",
+  "aud": "",
+  "role": "",
+  "email": "example@example.com",
+  "invited_at": "2018-05-25T20:28:04.436230023Z",
+  "app_metadata": {
+    "roles": [
+    "admin",
+    "test",
+    "second-test-role",
+    "third"
+    ]
+  },
+  "user_metadata": null,
+  "created_at": "2018-05-25T20:28:03.684905861Z",
+  "updated_at": "2018-05-25T20:28:04.862592451Z"
 }
 ```
 
