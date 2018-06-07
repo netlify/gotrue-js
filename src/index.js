@@ -20,7 +20,6 @@ export default class GoTrue {
       this.audience = audience;
     }
 
-    console.log("setCookie: %o", setCookie); // eslint-disable-line
     this.setCookie = setCookie;
 
     this.api = new API(APIUrl);
