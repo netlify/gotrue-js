@@ -78,7 +78,7 @@ Example response object:
 
 Also, make sure the `Registration preferences` under `Identity settings` in your Netlify dashboard are set to `Open`.
 
-![registration preferences](https://github.com/netlify/gotrue-js/blob/update-readme/src/images/identity-settings-registration.png, "registration preferences")
+![registration preferences](src/images/identity-settings-registration.png)
 
 If the registration preferences is set to be `Invite only`, you'll get an error message like this:
 `{code: 403, msg: 'Signups not allowed for this instance'}`
