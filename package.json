@@ -5,6 +5,7 @@
   "author": "Mathias Biilmann Christensen",
   "bugs": "https://github.com/netlify/micro-api-client-lib/issues",
   "dependencies": {
+    "babel-runtime": "^6.26.0",
     "micro-api-client": "^3.2.1"
   },
   "devDependencies": {
@@ -12,6 +13,7 @@
     "babel-eslint": "^8.2.1",
     "babel-plugin-syntax-object-rest-spread": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "babelify": "^7.3.0",
     "browserify": "^14.4.0",
