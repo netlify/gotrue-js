@@ -879,7 +879,7 @@ Example response object:
 
 ## See also
 
-* [gotrue]()
-* [netlify-identity-widget]()
-* [micro-api-client-library]()
-* [Netlify identity docs]()
+* [gotrue](https://github.com/netlify/gotrue)
+* [netlify-identity-widget](https://github.com/netlify/netlify-identity-widget/)
+* [micro-api-client-library](https://github.com/netlify/micro-api-client-lib)
+* [Netlify identity docs](https://www.netlify.com/docs/identity/)
