@@ -7,7 +7,7 @@ This is a JavaScript client library for the [GoTrue](https://github.com/netlify/
 It lets you create and authenticate users and is a building block for constructing
 the UI for signups, password recovery, login and logout.
 
-Play around the methods via the [demo site](https://lunaceee-gotruejs.netlify.com/).
+Play around the methods via the [demo site](https://gotruejs-playground.netlify.com/).
 
 ## Installation
 
