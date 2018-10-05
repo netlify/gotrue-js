@@ -18,7 +18,7 @@ export default class User {
   }
 
   static removeSavedSession() {
-    localStorage.removeItem(storageKey);
+    sessionStorage.removeItem(storageKey);
   }
 
   static recoverSession(apiInstance) {
@@ -26,7 +26,7 @@ export default class User {
       return currentUser;
     }
 
-    const json = localStorage.getItem(storageKey);
+    const json = sessionStorage.getItem(storageKey);
     if (json) {
       try {
         const data = JSON.parse(json);
