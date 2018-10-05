@@ -35,7 +35,7 @@ APIUrl: The absolute path of the GoTrue endpoint. To find the `APIUrl`, go to `I
 
 audience(optional): `audience` is one of the pre-defined [JWT payload](https://tools.ietf.org/html/rfc7519#section-4.1.3) claims. It's an optional attribute which is set to be empty by default. If you were hosting your own identity service and wanted to support [multitenancy](https://en.wikipedia.org/wiki/Multitenancy), you would need `audience` to separate the users.
 
-setCookie(optional): set to be `false` by default. If you wish to implement the `remember me` functionality with cookie, set the value to be `true`.
+setCookie(optional): set to be `false` by default. If you wish to implement the `remember me` functionality, set the value to be `true`.
 
 ### Error handling
 
@@ -167,7 +167,7 @@ Example response object:
 ### Login a user
 
 Handles user login via the specified email and password.
-reminder(optional): set to be `false` by default. If you wish to implement the `remember me` functionality with sessionStorage, set the value to be `true`.
+reminder(optional): set to be `false` by default. If you wish to implement the `remember me` functionality for the session only, set the value to be `true` and `setCookie=false` when you instantiate your GoTrue auth client.
 
 `auth.login(email, password, reminder)`
 
