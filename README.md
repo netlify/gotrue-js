@@ -128,7 +128,7 @@ auth
   });
 ```
 
-_This method requires usage of browser window object `localStorage`. Test the usage in your front end code._
+_This method requires usage of browser window object `sessionStorage`. Test the usage in your front end code._
 
 Example response object:
 
