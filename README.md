@@ -166,7 +166,8 @@ Example response object:
 
 ### Login a user
 
-Handles user login via the specified email, password and reminder(optional): set to be `false` by default. If you wish to implement the `remember me` functionality with sessionStorage, set the value to be `true`.
+Handles user login via the specified email and password.
+reminder(optional): set to be `false` by default. If you wish to implement the `remember me` functionality with sessionStorage, set the value to be `true`.
 
 `auth.login(email, password, reminder)`
 
