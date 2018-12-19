@@ -48,6 +48,11 @@ export default class GoTrue {
   }
 
   signup(email, password, data) {
+    if (typeof email === 'object' && email.password) {
+      data = email.data;
+      password = email.password;
+      email = email.email;
+    }
     return this._request("/signup", {
       method: "POST",
       body: JSON.stringify({ email, password, data })
@@ -55,6 +60,11 @@ export default class GoTrue {
   }
 
   login(email, password, remember) {
+    if (typeof email === 'object' && email.password) {
+      remember = email.remember;
+      password = email.password;
+      email = email.email;
+    }
     this._setRememberHeaders(remember);
     return this._request("/token", {
       method: "POST",
@@ -73,6 +83,10 @@ export default class GoTrue {
   }
 
   confirm(token, remember) {
+    if (typeof token === 'object' && token.remember) {
+      remember = token.remember;
+      token = token.token;
+    }
     this._setRememberHeaders(remember);
     return this.verify("signup", token, remember);
   }
@@ -85,11 +99,20 @@ export default class GoTrue {
   }
 
   recover(token, remember) {
+    if (typeof token === 'object' && token.remember) {
+      remember = token.remember;
+      token = token.token;
+    }
     this._setRememberHeaders(remember);
     return this.verify("recovery", token, remember);
   }
 
   acceptInvite(token, password, remember) {
+    if (typeof token === 'object' && token.password) {
+      remember = token.remember;
+      password = token.password;
+      token = token.token;
+    }
     this._setRememberHeaders(remember);
     return this._request("/verify", {
       method: "POST",
@@ -121,6 +144,11 @@ export default class GoTrue {
   }
 
   verify(type, token, remember) {
+    if (typeof type === 'object' && type.token) {
+      remember = type.remember;
+      token = type.token;
+      type = type.token;
+    }
     this._setRememberHeaders(remember);
     return this._request("/verify", {
       method: "POST",
