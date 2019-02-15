@@ -334,6 +334,8 @@ This function updates a user object with specified attributes
 
 `user.update( attributes )`
 
+Users can update their `user_metadata` field.  To do this, pass an object to the `attributes.data` key with the fields you want to update.  Updates to a users `app_metadata` must be performed from a secure environment, such as a [Lambda function](https://www.netlify.com/docs/functions/).  For examples on updating user and app metadata, see [netlify/identity-update-user-data](https://github.com/netlify/identity-update-user-data).
+
 Example usage:
 
 ```js
