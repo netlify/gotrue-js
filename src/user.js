@@ -7,6 +7,7 @@ const refreshPromises = {};
 let currentUser = null;
 const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes = { api: 1 };
+const isBrowser = () => typeof(window) !== "undefined";
 
 export default class User {
   constructor(api, tokenResponse, audience) {
@@ -18,7 +19,7 @@ export default class User {
   }
 
   static removeSavedSession() {
-    localStorage.removeItem(storageKey);
+    isBrowser() && localStorage.removeItem(storageKey);
   }
 
   static recoverSession(apiInstance) {
@@ -26,7 +27,7 @@ export default class User {
       return currentUser;
     }
 
-    const json = localStorage.getItem(storageKey);
+    const json = isBrowser() && localStorage.getItem(storageKey);
     if (json) {
       try {
         const data = JSON.parse(json);
@@ -157,7 +158,7 @@ export default class User {
 
   _refreshSavedSession() {
     // only update saved session if we previously saved something
-    if (localStorage.getItem(storageKey)) {
+    if (isBrowser() && localStorage.getItem(storageKey)) {
       this._saveSession();
     }
     return this;
@@ -175,7 +176,7 @@ export default class User {
   }
 
   _saveSession() {
-    localStorage.setItem(storageKey, JSON.stringify(this._details));
+    isBrowser() && localStorage.setItem(storageKey, JSON.stringify(this._details));
     return this;
   }
 
