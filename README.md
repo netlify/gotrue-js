@@ -883,7 +883,7 @@ Example response object:
 
 Currently we support Google, GitHub, GitLab, and BitBucket as directly supported in the Netlify app UI (other oauth providers require serverless functions to be set up correctly, but these don't.)
 
-`[acceptInviteExternalUrl](https://github.com/netlify/gotrue-js/blob/6dda47191dac9194658c5899272fc962d96f8cd6/index.d.ts#L21)` and `[loginExternalUrl](https://github.com/netlify/gotrue-js/blob/6dda47191dac9194658c5899272fc962d96f8cd6/index.d.ts#L26)` are useful for that. You can see example usage in [netlify-identity-widget](https://github.com/netlify/netlify-identity-widget/blob/ece08ed2a3653adcad87cf3998277362e362da60/src/state/store.js#L99-L119)
+[`acceptInviteExternalUrl`](https://github.com/netlify/gotrue-js/blob/6dda47191dac9194658c5899272fc962d96f8cd6/index.d.ts#L21) and [`loginExternalUrl`](https://github.com/netlify/gotrue-js/blob/6dda47191dac9194658c5899272fc962d96f8cd6/index.d.ts#L26) are useful for that. You can see example usage in [`netlify-identity-widget`](https://github.com/netlify/netlify-identity-widget/blob/ece08ed2a3653adcad87cf3998277362e362da60/src/state/store.js#L99-L119)
 
 ## See also
 
