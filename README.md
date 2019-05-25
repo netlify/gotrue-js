@@ -606,7 +606,7 @@ Example response object:
 
 ### Invite a user
 
-To invite a user using the admin token, do a `POST` request to `/invite` endpoint.
+To invite a user using the admin token, do a `POST` request to `/invite` endpoint. It's not possible to set `user_metadata` or `app_metadata` until a user has been created.
 
 Example usage:
 
@@ -647,12 +647,7 @@ Example response:
   "email": "example@example.com",
   "invited_at": "2018-05-25T20:28:04.436230023Z",
   "app_metadata": {
-    "roles": [
-    "admin",
-    "test",
-    "second-test-role",
-    "third"
-    ]
+    "provider": "email"
   },
   "user_metadata": null,
   "created_at": "2018-05-25T20:28:03.684905861Z",
