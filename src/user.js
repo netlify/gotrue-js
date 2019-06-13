@@ -22,6 +22,12 @@ export default class User {
     isBrowser() && localStorage.removeItem(storageKey);
   }
 
+  getUserData() {
+    return this._request("/user")
+      .then(this._saveUserData.bind(this))
+      .then(this._refreshSavedSession.bind(this));
+  }
+
   static recoverSession(apiInstance) {
     if (currentUser) {
       return currentUser;
@@ -124,12 +130,6 @@ export default class User {
           return Promise.reject(err);
         });
     });
-  }
-
-  getUserData() {
-    return this._request("/user")
-      .then(this._saveUserData.bind(this))
-      .then(this._refreshSavedSession.bind(this));
   }
 
   _saveUserData(attributes, fromStorage) {
