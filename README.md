@@ -168,13 +168,13 @@ Example response object:
 
 Handles user login via the specified email and password
 
-`auth.login(email, password)`
+`auth.login(email, password, saveSession)`
 
 Example usage:
 
 ```js
 auth
-  .login(email.value, password.value)
+  .login(email.value, password.value, true)
   .then(response => {
     showMessage("Success! Response: " + JSON.stringify({ response }), form);
   })
