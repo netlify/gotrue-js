@@ -61,7 +61,13 @@ export default class User {
   }
 
   jwt(forceRefresh) {
-    const { expires_at, refresh_token, access_token } = this.tokenDetails();
+    const token = this.tokenDetails();
+    if (token === null || token === undefined) {
+      return Promise.reject(
+        new Error(`Gotrue-js: failed getting jwt access token`)
+      );
+    }
+    const { expires_at, refresh_token, access_token } = token;
     if (forceRefresh || expires_at - ExpiryMargin < Date.now()) {
       return this._refreshToken(refresh_token);
     }
