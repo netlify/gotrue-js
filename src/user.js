@@ -1,13 +1,13 @@
-import API, { JSONHTTPError } from "micro-api-client";
-import Admin from "./admin";
+import API, { JSONHTTPError } from 'micro-api-client';
+import Admin from './admin';
 
 const ExpiryMargin = 60 * 1000;
-const storageKey = "gotrue.user";
+const storageKey = 'gotrue.user';
 const refreshPromises = {};
 let currentUser = null;
 const forbiddenUpdateAttributes = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes = { api: 1 };
-const isBrowser = () => typeof(window) !== "undefined";
+const isBrowser = () => typeof window !== 'undefined';
 
 export default class User {
   constructor(api, tokenResponse, audience) {
@@ -52,10 +52,10 @@ export default class User {
   }
 
   update(attributes) {
-    return this._request("/user", {
-      method: "PUT",
-      body: JSON.stringify(attributes)
-    }).then(response => {
+    return this._request('/user', {
+      method: 'PUT',
+      body: JSON.stringify(attributes),
+    }).then((response) => {
       return this._saveUserData(response)._refreshSavedSession();
     });
   }
@@ -63,9 +63,7 @@ export default class User {
   jwt(forceRefresh) {
     const token = this.tokenDetails();
     if (token === null || token === undefined) {
-      return Promise.reject(
-        new Error(`Gotrue-js: failed getting jwt access token`)
-      );
+      return Promise.reject(new Error(`Gotrue-js: failed getting jwt access token`));
     }
     const { expires_at, refresh_token, access_token } = token;
     if (forceRefresh || expires_at - ExpiryMargin < Date.now()) {
@@ -75,7 +73,7 @@ export default class User {
   }
 
   logout() {
-    return this._request("/logout", { method: "POST" })
+    return this._request('/logout', { method: 'POST' })
       .then(this.clearSession.bind(this))
       .catch(this.clearSession.bind(this));
   }
@@ -85,18 +83,18 @@ export default class User {
       return refreshPromises[refresh_token];
     }
     return (refreshPromises[refresh_token] = this.api
-      .request("/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `grant_type=refresh_token&refresh_token=${refresh_token}`
+      .request('/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `grant_type=refresh_token&refresh_token=${refresh_token}`,
       })
-      .then(response => {
+      .then((response) => {
         delete refreshPromises[refresh_token];
         this._processTokenResponse(response);
         this._refreshSavedSession();
         return this.token.access_token;
       })
-      .catch(error => {
+      .catch((error) => {
         delete refreshPromises[refresh_token];
         this.clearSession();
         return Promise.reject(error);
@@ -108,18 +106,18 @@ export default class User {
 
     const aud = options.audience || this.audience;
     if (aud) {
-      options.headers["X-JWT-AUD"] = aud;
+      options.headers['X-JWT-AUD'] = aud;
     }
 
-    return this.jwt().then(token => {
+    return this.jwt().then((token) => {
       return this.api
         .request(path, {
           headers: Object.assign(options.headers, {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           }),
-          ...options
+          ...options,
         })
-        .catch(err => {
+        .catch((err) => {
           if (err instanceof JSONHTTPError && err.json) {
             if (err.json.msg) {
               err.message = err.json.msg;
@@ -133,7 +131,7 @@ export default class User {
   }
 
   getUserData() {
-    return this._request("/user")
+    return this._request('/user')
       .then(this._saveUserData.bind(this))
       .then(this._refreshSavedSession.bind(this));
   }
@@ -153,12 +151,16 @@ export default class User {
 
   _processTokenResponse(tokenResponse) {
     this.token = tokenResponse;
-    let claims
+    let claims;
     try {
-      claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split(".")[1]));
+      claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split('.')[1]));
       this.token.expires_at = claims.exp * 1000;
     } catch (e) {
-      console.error(new Error(`Gotrue-js: Failed to parse tokenResponse claims: ${JSON.stringify(tokenResponse)}`))
+      console.error(
+        new Error(
+          `Gotrue-js: Failed to parse tokenResponse claims: ${JSON.stringify(tokenResponse)}`,
+        ),
+      );
     }
   }
 
@@ -197,7 +199,8 @@ export default class User {
   }
 }
 
-function urlBase64Decode(str) { // From https://jwt.io/js/jwt.js
+function urlBase64Decode(str) {
+  // From https://jwt.io/js/jwt.js
   var output = str.replace(/-/g, '+').replace(/_/g, '/');
   switch (output.length % 4) {
     case 0:
@@ -212,7 +215,7 @@ function urlBase64Decode(str) { // From https://jwt.io/js/jwt.js
       throw 'Illegal base64url string!';
   }
   var result = window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
-  try{
+  try {
     return decodeURIComponent(escape(result));
   } catch (err) {
     return result;
