@@ -1,18 +1,14 @@
-import API, { JSONHTTPError } from "micro-api-client";
-import User from "./user";
+import API, { JSONHTTPError } from 'micro-api-client';
+import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `/.netlify/identity`;
 
 export default class GoTrue {
-  constructor({
-    APIUrl = defaultApiURL,
-    audience = "",
-    setCookie = false,
-  } = {}) {
+  constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false } = {}) {
     if (APIUrl.match(HTTPRegexp)) {
       console.warn(
-        "Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely."
+        'Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.',
       );
     }
 
@@ -29,7 +25,7 @@ export default class GoTrue {
     options.headers = options.headers || {};
     const aud = options.audience || this.audience;
     if (aud) {
-      options.headers["X-JWT-AUD"] = aud;
+      options.headers['X-JWT-AUD'] = aud;
     }
     return this.api.request(path, options).catch((err) => {
       if (err instanceof JSONHTTPError && err.json) {
@@ -44,23 +40,23 @@ export default class GoTrue {
   }
 
   settings() {
-    return this._request("/settings");
+    return this._request('/settings');
   }
 
   signup(email, password, data) {
-    return this._request("/signup", {
-      method: "POST",
+    return this._request('/signup', {
+      method: 'POST',
       body: JSON.stringify({ email, password, data }),
     });
   }
 
   login(email, password, remember) {
     this._setRememberHeaders(remember);
-    return this._request("/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    return this._request('/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `grant_type=password&username=${encodeURIComponent(
-        email
+        email,
       )}&password=${encodeURIComponent(password)}`,
     }).then((response) => {
       User.removeSavedSession();
@@ -74,26 +70,26 @@ export default class GoTrue {
 
   confirm(token, remember) {
     this._setRememberHeaders(remember);
-    return this.verify("signup", token, remember);
+    return this.verify('signup', token, remember);
   }
 
   requestPasswordRecovery(email) {
-    return this._request("/recover", {
-      method: "POST",
+    return this._request('/recover', {
+      method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
   recover(token, remember) {
     this._setRememberHeaders(remember);
-    return this.verify("recovery", token, remember);
+    return this.verify('recovery', token, remember);
   }
 
   acceptInvite(token, password, remember) {
     this._setRememberHeaders(remember);
-    return this._request("/verify", {
-      method: "POST",
-      body: JSON.stringify({ token, password, type: "signup" }),
+    return this._request('/verify', {
+      method: 'POST',
+      body: JSON.stringify({ token, password, type: 'signup' }),
     }).then((response) => this.createUser(response, remember));
   }
 
@@ -120,8 +116,8 @@ export default class GoTrue {
 
   verify(type, token, remember) {
     this._setRememberHeaders(remember);
-    return this._request("/verify", {
-      method: "POST",
+    return this._request('/verify', {
+      method: 'POST',
       body: JSON.stringify({ token, type }),
     }).then((response) => this.createUser(response, remember));
   }
@@ -129,11 +125,11 @@ export default class GoTrue {
   _setRememberHeaders(remember) {
     if (this.setCookie) {
       this.api.defaultHeaders = this.api.defaultHeaders || {};
-      this.api.defaultHeaders["X-Use-Cookie"] = remember ? "1" : "session";
+      this.api.defaultHeaders['X-Use-Cookie'] = remember ? '1' : 'session';
     }
   }
 }
 
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   window.GoTrue = GoTrue;
 }
