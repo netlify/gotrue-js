@@ -8,7 +8,7 @@ export default class GoTrue {
   constructor({
     APIUrl = defaultApiURL,
     audience = "",
-    setCookie = false
+    setCookie = false,
   } = {}) {
     if (APIUrl.match(HTTPRegexp)) {
       console.warn(
@@ -31,7 +31,7 @@ export default class GoTrue {
     if (aud) {
       options.headers["X-JWT-AUD"] = aud;
     }
-    return this.api.request(path, options).catch(err => {
+    return this.api.request(path, options).catch((err) => {
       if (err instanceof JSONHTTPError && err.json) {
         if (err.json.msg) {
           err.message = err.json.msg;
@@ -50,7 +50,7 @@ export default class GoTrue {
   signup(email, password, data) {
     return this._request("/signup", {
       method: "POST",
-      body: JSON.stringify({ email, password, data })
+      body: JSON.stringify({ email, password, data }),
     });
   }
 
@@ -61,8 +61,8 @@ export default class GoTrue {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `grant_type=password&username=${encodeURIComponent(
         email
-      )}&password=${encodeURIComponent(password)}`
-    }).then(response => {
+      )}&password=${encodeURIComponent(password)}`,
+    }).then((response) => {
       User.removeSavedSession();
       return this.createUser(response, remember);
     });
@@ -80,7 +80,7 @@ export default class GoTrue {
   requestPasswordRecovery(email) {
     return this._request("/recover", {
       method: "POST",
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email }),
     });
   }
 
@@ -93,20 +93,18 @@ export default class GoTrue {
     this._setRememberHeaders(remember);
     return this._request("/verify", {
       method: "POST",
-      body: JSON.stringify({ token, password, type: "signup" })
-    }).then(response => this.createUser(response, remember));
+      body: JSON.stringify({ token, password, type: "signup" }),
+    }).then((response) => this.createUser(response, remember));
   }
 
   acceptInviteExternalUrl(provider, token) {
-    return `${
-      this.api.apiURL
-    }/authorize?provider=${provider}&invite_token=${token}`;
+    return `${this.api.apiURL}/authorize?provider=${provider}&invite_token=${token}`;
   }
 
   createUser(tokenResponse, remember = false) {
     this._setRememberHeaders(remember);
     const user = new User(this.api, tokenResponse, this.audience);
-    return user.getUserData().then(user => {
+    return user.getUserData().then((user) => {
       if (remember) {
         user._saveSession();
       }
@@ -124,8 +122,8 @@ export default class GoTrue {
     this._setRememberHeaders(remember);
     return this._request("/verify", {
       method: "POST",
-      body: JSON.stringify({ token, type })
-    }).then(response => this.createUser(response, remember));
+      body: JSON.stringify({ token, type }),
+    }).then((response) => this.createUser(response, remember));
   }
 
   _setRememberHeaders(remember) {

@@ -7,7 +7,7 @@ export default class Admin {
   listUsers(aud) {
     return this.user._request("/admin/users", {
       method: "GET",
-      audience: aud
+      audience: aud,
     });
   }
 
@@ -18,7 +18,7 @@ export default class Admin {
   updateUser(user, attributes = {}) {
     return this.user._request(`/admin/users/${user.id}`, {
       method: "PUT",
-      body: JSON.stringify(attributes)
+      body: JSON.stringify(attributes),
     });
   }
 
@@ -27,13 +27,13 @@ export default class Admin {
     attributes.password = password;
     return this.user._request("/admin/users", {
       method: "POST",
-      body: JSON.stringify(attributes)
+      body: JSON.stringify(attributes),
     });
   }
 
   deleteUser(user) {
     return this.user._request(`/admin/users/${user.id}`, {
-      method: "DELETE"
+      method: "DELETE",
     });
   }
 }
