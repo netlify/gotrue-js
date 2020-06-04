@@ -40,9 +40,9 @@
   "scripts": {
     "babelify": "browserify src/index.js -t [ babelify --presets [ env ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/gotrue.js",
     "compile": "babel src -d lib",
-    "format": "eslint . --fix && prettier --write 'src/**/*.js'",
-    "format:check": "prettier --check 'src/**/*.js'",
-    "prettier-preview": "prettier --list-different 'src/**/*.js'",
+    "format": "eslint . --fix && prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\"",
+    "prettier-preview": "prettier --list-different \"src/**/*.js\"",
     "prepublish": "npm run compile",
     "lint": "eslint .",
     "test": "run-s lint format:check",
