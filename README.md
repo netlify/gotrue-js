@@ -657,7 +657,7 @@ Example response:
 
 ### Create a new user
 
-This function creates a new user object with the specified new email and password and other optional attributes.
+This function creates a new user object with the specified new email and password and other optional attributes. User will not be confirmed unless `confirm` parameter is set to true.
 
 ```js
 createUser(email, password, attributes = {}) {
@@ -685,7 +685,7 @@ exports.handler = async (event, context) => {
     return fetch(usersUrl, {
       method: "POST",
       headers: { Authorization: adminAuthHeader },
-      body: JSON.stringify({ email: "new-email@netlify.com", password: "newpw" })
+      body: JSON.stringify({ email: "new-email@netlify.com", password: "newpw", confirm: true })
     })
       .then(response => {
         return response.json();
