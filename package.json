@@ -8,13 +8,13 @@
     "micro-api-client": "^3.2.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-proposal-object-rest-spread": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
-    "babel-cli": "^6.8.0",
     "babel-eslint": "^10.1.0",
-    "babel-plugin-syntax-object-rest-spread": "^6.8.0",
-    "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "babel-preset-env": "^1.6.1",
     "babelify": "^10.0.0",
     "browserify": "^16.0.0",
     "eslint": "^7.2.0",
@@ -41,7 +41,7 @@
     "url": "git+https://github.com/netlify/gotrue-js.git"
   },
   "scripts": {
-    "babelify": "browserify src/index.js -t [ babelify --presets [ env ] --plugins syntax-object-rest-spread,transform-object-rest-spread ] | uglifyjs > browser/gotrue.js",
+    "babelify": "browserify src/index.js -t [ babelify --presets [ @babel/preset-env ] --plugins [ @babel/plugin-proposal-object-rest-spread ] ] | uglifyjs > browser/gotrue.js",
     "compile": "babel src -d lib",
     "format": "eslint . --fix && prettier --write \"src/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\"",
