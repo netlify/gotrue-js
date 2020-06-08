@@ -39,5 +39,5 @@ jobs:
       - name: run tests
         run: yarn test
       - name: compile code
-        run: yarn compile
+        run: yarn babelify
   
