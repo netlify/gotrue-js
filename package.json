@@ -1,7 +1,7 @@
 {
   "name": "gotrue-js",
   "description": "GoTrue API client for JavaScript",
-  "version": "0.9.25",
+  "version": "0.9.26",
   "author": "Mathias Biilmann Christensen",
   "bugs": "https://github.com/netlify/micro-api-client-lib/issues",
   "dependencies": {
@@ -54,6 +54,6 @@
     "lint": "eslint .",
     "test": "run-s lint format:check",
     "version": "npm run babelify && git add browser/gotrue.js",
-    "release": "cross-env CI=true yarn install && yarn run version && semantic-release && npm publish"
+    "release": "yarn install && yarn run version && cross-env CI=true semantic-release && npm publish"
   }
 }
