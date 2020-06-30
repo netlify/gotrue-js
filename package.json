@@ -19,6 +19,7 @@
     "babel-eslint": "^10.1.0",
     "babelify": "^10.0.0",
     "browserify": "^16.0.0",
+    "cross-env": "^7.0.2",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.20.2",
@@ -53,6 +54,6 @@
     "lint": "eslint .",
     "test": "run-s lint format:check",
     "version": "npm run babelify && git add browser/gotrue.js",
-    "release": "CI=true yarn install && yarn run version && semantic-release && npm publish"
+    "release": "cross-env CI=true yarn install && yarn run version && semantic-release && npm publish"
   }
 }
