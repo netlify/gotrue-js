@@ -15,6 +15,64 @@ Play around the methods via the [demo site](https://gotruejs-playground.netlify.
 yarn add gotrue-js
 ```
 
+## API
+
+- `signup()`: creates a new user
+  - options
+    - `email`
+    - `password`
+    - `provider`
+- `login()`: log in an existing user
+  - options
+    - `email`
+    - `password`
+    - `provider`
+- `forgotPassword()`
+- `jwt()`
+
+## User specific funtions
+
+- `user()`: returns the current logged in user `// calls admin.getUser()`
+  - `jwt {string}` optional
+- `user().update()`: update the current logged-in user data `// calls admin.updateUser()`
+- `user().logout()`: remove session for current user
+- `user().jwt()`: gets the JWT for the logged in user
+  - `forceRefresh`: if passed in calls `// calls _refresh()`
+
+### Hooks/callback
+
+- `onAuthStateChange()` - callback on any change to auth user
+  - `callbackFunction {function}` function to be called on change
+
+
+
+
+if we add the auth schema to the postgrest config:
+- can we only expose public via openapi spec
+- can we allow BYPASS users to run operations on Auth schema
+
+
+
+
+### Administrative methods
+
+- `admin.getUser()`: takes a JWT and returns the valid user
+  - `jwt {string}`
+- `admin.updateUser()`: takes a JWT and updates the data
+  - `jwt {string}`
+  - `data {object}`
+- `admin.refresh()`: takes any refresh token
+  - `jwt {string}`
+
+
+Out
+
+delete / invite 
+
+
+Should we create admin methods inside the `public` schema using 
+
+
 ## Usage
 
 ```js
