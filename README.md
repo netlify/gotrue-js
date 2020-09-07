@@ -1,23 +1,55 @@
-# gotrue-js library
+# `gotrue-js`
 
-[![Build Status](https://travis-ci.org/netlify/gotrue-js.svg?branch=master)](https://travis-ci.org/netlify/gotrue-js)
+This is an isomorphic JavaScript client library for the [GoTrue](https://github.com/netlify/gotrue) API.
 
-This is a JavaScript client library for the [GoTrue](https://github.com/netlify/gotrue) API.
-
-It lets you create and authenticate users and is a building block for constructing
-the UI for signups, password recovery, login and logout.
-
-Play around the methods via the [demo site](https://gotruejs-playground.netlify.com/).
-
-## Installation
-
-```bash
-yarn add gotrue-js
-```
 
 ## API
 
-- `signup()`: creates a new user
+`signup()`: creates a new user
+
+<details>
+  <summary>Parameters</summary>
+
+  ### `signup(options)`
+
+  #### `options`
+  
+  Either the email login details or the OAuth provider details.
+
+  ```ts
+  interface options {
+    email?: string
+    password?: string
+    provider?: string
+  }
+
+  ```
+</details>
+
+
+`login()`: log in an existing user
+
+
+<details>
+  <summary>Parameters</summary>
+
+  ### `signup(options)`
+
+  #### `options`
+  
+  Either the email login details or the OAuth provider details.
+
+  ```ts
+  interface options {
+    email?: string
+    password?: string
+    provider?: string
+  }
+
+  ```
+</details>
+
+---
   - options
     - `email`
     - `password`
@@ -29,6 +61,15 @@ yarn add gotrue-js
     - `provider`
 - `forgotPassword()`
 - `jwt()`
+
+
+
+## Installation
+
+```bash
+npm install --save @supabase/gotrue-js
+```
+
 
 ## User specific funtions
 
