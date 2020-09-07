@@ -27,7 +27,7 @@ declare class GoTrue {
     recover(token: string, remember?: boolean): Promise<User>;
     requestPasswordRecovery(email: string): Promise<void>;
     settings(): Promise<Settings>;
-    signup(email: string, password: string, data: any): Promise<User>;
+    signup(email: string, password: string, data?: any): Promise<User>;
     verify(type: string, token: string, remember?: boolean): Promise<User>;
 }
 
