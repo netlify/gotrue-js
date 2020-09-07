@@ -12,6 +12,10 @@ npm install --save @supabase/gotrue-js
 
 ## API
 
+See XXX for more docs.
+
+----
+
 `signup()`: creates a new user
 
 <details>
@@ -33,6 +37,7 @@ npm install --save @supabase/gotrue-js
   ```
 </details>
 
+----
 
 `login()`: log in an existing user
 
@@ -54,6 +59,8 @@ npm install --save @supabase/gotrue-js
 
   ```
 </details>
+
+----
 
 `forgotPassword()`: sends a user an email to reset their password
 
@@ -77,6 +84,8 @@ npm install --save @supabase/gotrue-js
   ```
 </details>
 
+----
+
 `jwt()`: parse a JWT
 
 <details>
@@ -97,6 +106,8 @@ npm install --save @supabase/gotrue-js
 
   ```
 </details>
+
+----
 
 ### User specific funtions
 
