@@ -3,6 +3,13 @@
 This is an isomorphic JavaScript client library for the [GoTrue](https://github.com/netlify/gotrue) API.
 
 
+## Installation
+
+```bash
+npm install --save @supabase/gotrue-js
+```
+
+
 ## API
 
 `signup()`: creates a new user
@@ -10,9 +17,9 @@ This is an isomorphic JavaScript client library for the [GoTrue](https://github.
 <details>
   <summary>Parameters</summary>
 
-  ### `signup(options)`
+  #### `signup(options)`
 
-  #### `options`
+  ##### `options`
   
   Either the email login details or the OAuth provider details.
 
@@ -29,13 +36,12 @@ This is an isomorphic JavaScript client library for the [GoTrue](https://github.
 
 `login()`: log in an existing user
 
-
 <details>
   <summary>Parameters</summary>
 
-  ### `signup(options)`
+  #### `signup(options)`
 
-  #### `options`
+  ##### `options`
   
   Either the email login details or the OAuth provider details.
 
@@ -49,29 +55,50 @@ This is an isomorphic JavaScript client library for the [GoTrue](https://github.
   ```
 </details>
 
----
-  - options
-    - `email`
-    - `password`
-    - `provider`
-- `login()`: log in an existing user
-  - options
-    - `email`
-    - `password`
-    - `provider`
-- `forgotPassword()`
-- `jwt()`
+`forgotPassword()`: sends a user an email to reset their password
 
 
+<details>
+  <summary>Parameters</summary>
 
-## Installation
+  #### `signup(options)`
 
-```bash
-npm install --save @supabase/gotrue-js
-```
+  ##### `options`
+  
+  Either the email login details or the OAuth provider details.
 
+  ```ts
+  interface options {
+    email?: string
+    password?: string
+    provider?: string
+  }
 
-## User specific funtions
+  ```
+</details>
+
+`jwt()`: parse a JWT
+
+<details>
+  <summary>Parameters</summary>
+
+  #### `signup(options)`
+
+  ##### `options`
+  
+  Either the email login details or the OAuth provider details.
+
+  ```ts
+  interface options {
+    email?: string
+    password?: string
+    provider?: string
+  }
+
+  ```
+</details>
+
+### User specific funtions
 
 - `user()`: returns the current logged in user `// calls admin.getUser()`
   - `jwt {string}` optional
@@ -80,7 +107,7 @@ npm install --save @supabase/gotrue-js
 - `user().jwt()`: gets the JWT for the logged in user
   - `forceRefresh`: if passed in calls `// calls _refresh()`
 
-### Hooks/callback
+#### Hooks/callback
 
 - `onAuthStateChange()` - callback on any change to auth user
   - `callbackFunction {function}` function to be called on change
