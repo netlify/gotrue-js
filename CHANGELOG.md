@@ -1,3 +1,10 @@
+## [0.9.27](https://github.com/netlify/gotrue-js/compare/v0.9.26...v0.9.27) (2020-09-07)
+
+
+### Bug Fixes
+
+* **types:** make signup data argument optional ([#165](https://github.com/netlify/gotrue-js/issues/165)) ([d1565a7](https://github.com/netlify/gotrue-js/commit/d1565a7d0576ff613b1c37c46a42d1fcbd720c7c))
+
 ## [0.9.26](https://github.com/netlify/gotrue-js/compare/v0.9.25...v0.9.26) (2020-06-30)
 
 
