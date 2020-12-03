@@ -429,6 +429,8 @@ user
 
 The following admin methods are currently not available to be used directly. You can access `context.clientContext.identity` and get a short lived admin token through a Lambda function and achieve the same goals, e.g., update user role, create or delete user etc. See [Functions and Identity](https://docs.netlify.com/functions/functions-and-identity/) for more info.
 
+> For users of [Netlify CLI](https://github.com/netlify/cli) - functions using admin methods will _not_ work locally - they need to be deployed to your site in order to work as intended.
+
 Let's create a simple login form in HTML and JavaScript to interact with a lambda function and test out the admin methods.
 
 1. Create an HTML form for user login
