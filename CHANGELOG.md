@@ -1,3 +1,10 @@
+## [0.9.28](https://github.com/netlify/gotrue-js/compare/v0.9.27...v0.9.28) (2020-12-07)
+
+
+### Bug Fixes
+
+* **docs-readme:** add note about using admin methods with Netlify CLI ([#234](https://github.com/netlify/gotrue-js/issues/234)) ([5f3d504](https://github.com/netlify/gotrue-js/commit/5f3d504b3694610d56027bf40ef7fbf2f1f37eaa))
+
 ## [0.9.27](https://github.com/netlify/gotrue-js/compare/v0.9.26...v0.9.27) (2020-09-07)
 
 
