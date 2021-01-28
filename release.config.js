@@ -10,8 +10,11 @@ module.exports = {
         npmPublish: false,
       },
     ],
-    ["@semantic-release/git", {
-      "assets": ['CHANGELOG.md', 'package.json', 'browser/gotrue.js']
-    }]
+    [
+      '@semantic-release/git',
+      {
+        assets: ['CHANGELOG.md', 'package.json', 'browser/gotrue.js'],
+      },
+    ],
   ],
 };
