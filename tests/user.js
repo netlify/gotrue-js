@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer';
 
 import test from 'ava';
+import sinon from 'sinon';
 
 import User from '../src/user.js';
 
@@ -23,4 +24,19 @@ test('should parse token in ctor', (t) => {
   const user = new User({}, tokenResponse, '');
 
   t.is(user.token.expires_at, 1000000);
+});
+
+test('should not log token on error', (t) => {
+  const spy = sinon.spy(console, 'error');
+  const tokenResponse = {
+    access_token: 'header.invalid.secret',
+  };
+
+  // eslint-disable-next-line no-new
+  new User({}, tokenResponse, '');
+
+  t.assert(spy.calledOnce);
+  const [error] = spy.getCall(0).args;
+  t.true(error instanceof Error);
+  t.false(error.message.includes(tokenResponse.access_token));
 });
