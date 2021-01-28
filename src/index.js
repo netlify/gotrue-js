@@ -1,5 +1,6 @@
 import API, { JSONHTTPError } from 'micro-api-client';
-import User from './user';
+
+import User from './user.js';
 
 const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `/.netlify/identity`;
@@ -27,15 +28,15 @@ export default class GoTrue {
     if (aud) {
       options.headers['X-JWT-AUD'] = aud;
     }
-    return this.api.request(path, options).catch((err) => {
-      if (err instanceof JSONHTTPError && err.json) {
-        if (err.json.msg) {
-          err.message = err.json.msg;
-        } else if (err.json.error) {
-          err.message = `${err.json.error}: ${err.json.error_description}`;
+    return this.api.request(path, options).catch((error) => {
+      if (error instanceof JSONHTTPError && error.json) {
+        if (error.json.msg) {
+          error.message = error.json.msg;
+        } else if (error.json.error) {
+          error.message = `${error.json.error}: ${error.json.error_description}`;
         }
       }
-      return Promise.reject(err);
+      return Promise.reject(error);
     });
   }
 
@@ -100,11 +101,11 @@ export default class GoTrue {
   createUser(tokenResponse, remember = false) {
     this._setRememberHeaders(remember);
     const user = new User(this.api, tokenResponse, this.audience);
-    return user.getUserData().then((user) => {
+    return user.getUserData().then((userData) => {
       if (remember) {
-        user._saveSession();
+        userData._saveSession();
       }
-      return user;
+      return userData;
     });
   }
 

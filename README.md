@@ -120,11 +120,11 @@ Example usage:
 ```js
 auth
   .confirm(token, true)
-  .then(function (response) {
+  .then((response) => {
     console.log('Confirmation email sent', JSON.stringify({ response }));
   })
-  .catch(function (e) {
-    console.log(e);
+  .catch((error) => {
+    console.log(error);
   });
 ```
 
@@ -176,14 +176,14 @@ Example usage:
 auth
   .login(email.value, password.value, true)
   .then((response) => {
-    showMessage('Success! Response: ' + JSON.stringify({ response }), form);
+    showMessage(`Success! Response: ${JSON.stringify({ response })}`, form);
   })
-  .catch((error) => showMessage('Failed :( ' + JSON.stringify(error), form));
+  .catch((error) => showMessage(`Failed :( ${JSON.stringify(error)}`, form));
 ```
 
 Example response object:
 
-```js
+```json
 {
   "response": {
     "api": {
@@ -492,30 +492,28 @@ exports.handler = async (event, context) => {
   const { identity, user } = context.clientContext;
   const userID = user.sub;
   const userUrl = `${identity.url}/admin/users/{${userID}}`;
-  const adminAuthHeader = 'Bearer ' + identity.token;
+  const adminAuthHeader = `Bearer ${  identity.token}`;
 
   try {
     return fetch(userUrl, {
       method: 'GET',
       headers: { Authorization: adminAuthHeader },
     })
-      .then((response) => {
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         console.log('data', JSON.stringify(data));
         return { statusCode: 204 };
       })
-      .catch((e) => {
+      .catch((error) => {
         console.log('Failed to get user! 500! Internal.');
         return {
           statusCode: 500,
-          body: 'Internal Server Error: ' + e,
+          body: `Internal Server Error: ${  error}`,
         };
       });
-  } catch (e) {
+  } catch (error) {
     console.log('GOT HERE! 500! outer');
-    return { statusCode: 500, body: 'Internal Server Error: ' + e };
+    return { statusCode: 500, body: `Internal Server Error: ${  error}` };
   }
 };
 ```
@@ -743,7 +741,7 @@ exports.handler = async (event, context) => {
   const { identity, user } = context.clientContext;
   const userID = user.sub;
   const userUrl = `${identity.url}/admin/users/{${userID}}`;
-  const adminAuthHeader = 'Bearer ' + identity.token;
+  const adminAuthHeader = `Bearer ${identity.token}`;
 
   try {
     return fetch(userUrl, {
@@ -758,14 +756,12 @@ exports.handler = async (event, context) => {
         console.log({ data });
         return { statusCode: 204 };
       })
-      .catch((e) => {
-        return {
+      .catch((error) => ({
           statusCode: 500,
-          body: 'Internal Server Error: ' + e,
-        };
-      });
-  } catch (e) {
-    return e;
+          body: `Internal Server Error: ${error}`,
+        }));
+  } catch (error) {
+    return error;
   }
 };
 ```
@@ -797,28 +793,24 @@ import fetch from 'node-fetch';
 exports.handler = async (event, context) => {
   const { identity, user } = context.clientContext;
   const usersUrl = `${identity.url}/admin/users`;
-  const adminAuthHeader = 'Bearer ' + identity.token;
+  const adminAuthHeader = `Bearer ${identity.token}`;
 
   try {
     return fetch(usersUrl, {
       method: 'GET',
       headers: { Authorization: adminAuthHeader },
     })
-      .then((response) => {
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         console.log('data', JSON.stringify(data));
         return { statusCode: 204 };
       })
-      .catch((e) => {
-        return {
+      .catch((error) => ({
           statusCode: 500,
-          body: 'Internal Server Error: ' + e,
-        };
-      });
-  } catch (e) {
-    return e;
+          body: `Internal Server Error: ${error}`,
+        }));
+  } catch (error) {
+    return error;
   }
 };
 ```

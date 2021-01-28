@@ -1,5 +1,6 @@
 import API, { JSONHTTPError } from 'micro-api-client';
-import Admin from './admin';
+
+import Admin from './admin.js';
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = 'gotrue.user';
@@ -38,8 +39,8 @@ export default class User {
 
         const api = apiInstance || new API(url, {});
         return new User(api, token, audience)._saveUserData(data, true);
-      } catch (ex) {
-        console.error(new Error(`Gotrue-js: Error recovering session: ${ex}`));
+      } catch (error) {
+        console.error(new Error(`Gotrue-js: Error recovering session: ${error}`));
         return null;
       }
     }
@@ -55,9 +56,7 @@ export default class User {
     return this._request('/user', {
       method: 'PUT',
       body: JSON.stringify(attributes),
-    }).then((response) => {
-      return this._saveUserData(response)._refreshSavedSession();
-    });
+    }).then((response) => this._saveUserData(response)._refreshSavedSession());
   }
 
   jwt(forceRefresh) {
@@ -109,25 +108,25 @@ export default class User {
       options.headers['X-JWT-AUD'] = aud;
     }
 
-    return this.jwt().then((token) => {
-      return this.api
+    return this.jwt().then((token) =>
+      this.api
         .request(path, {
           headers: Object.assign(options.headers, {
             Authorization: `Bearer ${token}`,
           }),
           ...options,
         })
-        .catch((err) => {
-          if (err instanceof JSONHTTPError && err.json) {
-            if (err.json.msg) {
-              err.message = err.json.msg;
-            } else if (err.json.error) {
-              err.message = `${err.json.error}: ${err.json.error_description}`;
+        .catch((error) => {
+          if (error instanceof JSONHTTPError && error.json) {
+            if (error.json.msg) {
+              error.message = error.json.msg;
+            } else if (error.json.error) {
+              error.message = `${error.json.error}: ${error.json.error_description}`;
             }
           }
-          return Promise.reject(err);
-        });
-    });
+          return Promise.reject(error);
+        }),
+    );
   }
 
   getUserData() {
@@ -151,11 +150,10 @@ export default class User {
 
   _processTokenResponse(tokenResponse) {
     this.token = tokenResponse;
-    let claims;
     try {
-      claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split('.')[1]));
+      const claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split('.')[1]));
       this.token.expires_at = claims.exp * 1000;
-    } catch (e) {
+    } catch (error) {
       console.error(
         new Error(
           `Gotrue-js: Failed to parse tokenResponse claims: ${JSON.stringify(tokenResponse)}`,
@@ -201,7 +199,7 @@ export default class User {
 
 function urlBase64Decode(str) {
   // From https://jwt.io/js/jwt.js
-  var output = str.replace(/-/g, '+').replace(/_/g, '/');
+  let output = str.replace(/-/g, '+').replace(/_/g, '/');
   switch (output.length % 4) {
     case 0:
       break;
@@ -214,10 +212,12 @@ function urlBase64Decode(str) {
     default:
       throw 'Illegal base64url string!';
   }
-  var result = window.atob(output); //polifyll https://github.com/davidchambers/Base64.js
+
+  // polifyll https://github.com/davidchambers/Base64.js
+  const result = window.atob(output);
   try {
     return decodeURIComponent(escape(result));
-  } catch (err) {
+  } catch (error) {
     return result;
   }
 }
