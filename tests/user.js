@@ -26,7 +26,7 @@ test('should parse token in ctor', (t) => {
   t.is(user.token.expires_at, 1000000);
 });
 
-test('should not log token on error', (t) => {
+test.serial('should not log token on error', (t) => {
   const spy = sinon.spy(console, 'error');
   const tokenResponse = {
     access_token: 'header.invalid.secret',
