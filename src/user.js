@@ -81,6 +81,7 @@ export default class User {
     if (refreshPromises[refresh_token]) {
       return refreshPromises[refresh_token];
     }
+
     return (refreshPromises[refresh_token] = this.api
       .request('/token', {
         method: 'POST',
@@ -93,6 +94,7 @@ export default class User {
         this._refreshSavedSession();
         return this.token.access_token;
       })
+      // eslint-disable-next-line promise/prefer-await-to-callbacks
       .catch((error) => {
         delete refreshPromises[refresh_token];
         this.clearSession();
@@ -100,7 +102,7 @@ export default class User {
       }));
   }
 
-  _request(path, options = {}) {
+  async _request(path, options = {}) {
     options.headers = options.headers || {};
 
     const aud = options.audience || this.audience;
@@ -108,25 +110,24 @@ export default class User {
       options.headers['X-JWT-AUD'] = aud;
     }
 
-    return this.jwt().then((token) =>
-      this.api
-        .request(path, {
-          headers: Object.assign(options.headers, {
-            Authorization: `Bearer ${token}`,
-          }),
-          ...options,
-        })
-        .catch((error) => {
-          if (error instanceof JSONHTTPError && error.json) {
-            if (error.json.msg) {
-              error.message = error.json.msg;
-            } else if (error.json.error) {
-              error.message = `${error.json.error}: ${error.json.error_description}`;
-            }
-          }
-          return Promise.reject(error);
+    try {
+      const token = await this.jwt();
+      return await this.api.request(path, {
+        headers: Object.assign(options.headers, {
+          Authorization: `Bearer ${token}`,
         }),
-    );
+        ...options,
+      });
+    } catch (error) {
+      if (error instanceof JSONHTTPError && error.json) {
+        if (error.json.msg) {
+          error.message = error.json.msg;
+        } else if (error.json.error) {
+          error.message = `${error.json.error}: ${error.json.error_description}`;
+        }
+      }
+      throw error;
+    }
   }
 
   getUserData() {
