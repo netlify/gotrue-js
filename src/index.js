@@ -22,13 +22,15 @@ export default class GoTrue {
     this.api = new API(APIUrl);
   }
 
-  _request(path, options = {}) {
+  async _request(path, options = {}) {
     options.headers = options.headers || {};
     const aud = options.audience || this.audience;
     if (aud) {
       options.headers['X-JWT-AUD'] = aud;
     }
-    return this.api.request(path, options).catch((error) => {
+    try {
+      return await this.api.request(path, options);
+    } catch (error) {
       if (error instanceof JSONHTTPError && error.json) {
         if (error.json.msg) {
           error.message = error.json.msg;
@@ -36,8 +38,8 @@ export default class GoTrue {
           error.message = `${error.json.error}: ${error.json.error_description}`;
         }
       }
-      return Promise.reject(error);
-    });
+      throw error;
+    }
   }
 
   settings() {
