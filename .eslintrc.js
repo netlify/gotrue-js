@@ -16,6 +16,7 @@ module.exports = {
 
     // TODO: enable these rules
     'consistent-this': 0,
+    'unicorn/no-this-assignment': 0,
     'func-style': 0,
     'no-throw-literal': 0,
     'no-param-reassign': 0,

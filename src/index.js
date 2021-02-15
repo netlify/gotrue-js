@@ -7,7 +7,7 @@ const defaultApiURL = `/.netlify/identity`;
 
 export default class GoTrue {
   constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false } = {}) {
-    if (APIUrl.match(HTTPRegexp)) {
+    if (HTTPRegexp.test(APIUrl)) {
       console.warn(
         'Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.',
       );
