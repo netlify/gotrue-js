@@ -48,7 +48,7 @@ module.exports = {
       extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
-        'prettier/@typescript-eslint',
+        'prettier',
         'plugin:import/errors',
         'plugin:import/warnings',
         'plugin:import/typescript',
