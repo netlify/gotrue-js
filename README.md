@@ -1,4 +1,4 @@
-# gotrue-js library
+![gotrue-js library](gotrue-js.png)
 
 [![Build Status](https://travis-ci.org/netlify/gotrue-js.svg?branch=master)](https://travis-ci.org/netlify/gotrue-js)
 
