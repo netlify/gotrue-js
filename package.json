@@ -43,7 +43,7 @@
     "babelify": "browserify src/index.js -t [ babelify --presets [ @babel/preset-env ] --plugins [ @babel/plugin-proposal-object-rest-spread ] ] | uglifyjs > browser/gotrue.js",
     "prepare": "run-s compile",
     "prepublishOnly": "run-s prepublishOnly:*",
-    "prepublishOnly:checkout": "git checkout master",
+    "prepublishOnly:checkout": "git checkout main",
     "prepublishOnly:pull": "git pull",
     "prepublishOnly:install": "npm ci",
     "prepublishOnly:test": "npm test",
