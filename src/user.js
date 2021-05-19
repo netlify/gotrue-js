@@ -1,6 +1,6 @@
 import API, { JSONHTTPError } from 'micro-api-client';
 
-import Admin from './admin.js';
+import Admin from './admin';
 
 const ExpiryMargin = 60 * 1000;
 const storageKey = 'gotrue.user';

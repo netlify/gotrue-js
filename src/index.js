@@ -1,6 +1,6 @@
 import API, { JSONHTTPError } from 'micro-api-client';
 
-import User from './user.js';
+import User from './user';
 
 const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `/.netlify/identity`;

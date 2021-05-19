@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import test from 'ava';
 import sinon from 'sinon';
 
-import User from '../src/user.js';
+import User from '../src/user';
 
 // mock window
 global.window = { atob: (base64) => Buffer.from(base64, 'base64').toString('ascii') };
