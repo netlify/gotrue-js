@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        node-version: [15.x]
+        node-version: ['*']
 
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+          check-latest: true
       - name: log versions
         run: node --version && npm --version
       - name: Install dependencies
@@ -39,7 +40,7 @@ jobs:
           os=${{ matrix.os }}
           node=${{ matrix.node-version }}
           echo "::set-output name=os::${os/-latest/}"
-          echo "::set-output name=node::node_${node//./}"
+          echo "::set-output name=node::node_${node//[.*]/}"
         shell: bash
       - uses: codecov/codecov-action@v1
         with:
