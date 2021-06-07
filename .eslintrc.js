@@ -39,6 +39,7 @@ module.exports = {
     'promise/no-nesting': 0,
     'node/no-unsupported-features/es-syntax': 0,
     camelcase: 0,
+    'unicorn/prefer-prototype-methods': 0,
   },
   overrides: [
     ...overrides,
