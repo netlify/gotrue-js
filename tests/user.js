@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 
 import test from 'ava';
-import sinon from 'sinon';
+import { spy } from 'sinon';
 
 import User from '../src/user';
 
@@ -27,7 +27,7 @@ test('should parse token in ctor', (t) => {
 });
 
 test.serial('should not log token on error', (t) => {
-  const spy = sinon.spy(console, 'error');
+  const errorSpy = spy(console, 'error');
   const tokenResponse = {
     access_token: 'header.invalid.secret',
   };
@@ -35,8 +35,8 @@ test.serial('should not log token on error', (t) => {
   // eslint-disable-next-line no-new
   new User({}, tokenResponse, '');
 
-  t.assert(spy.calledOnce);
-  const [error] = spy.getCall(0).args;
+  t.assert(errorSpy.calledOnce);
+  const [error] = errorSpy.getCall(0).args;
   t.true(error instanceof Error);
   t.false(error.message.includes(tokenResponse.access_token));
 });
