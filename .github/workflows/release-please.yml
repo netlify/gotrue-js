@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - chore/fix_release_please
 jobs:
   release-please:
     runs-on: ubuntu-latest
@@ -18,6 +19,8 @@ jobs:
           token: ${{ steps.get-token.outputs.token }}
           release-type: node
           package-name: 'gotrue-js'
+          bump-minor-pre-major: true
+          default-branch: chore/fix_release_please
       - uses: actions/checkout@v2
         if: ${{ steps.release.outputs.release_created }}
       - uses: actions/setup-node@v2
