@@ -5,6 +5,15 @@
 
 * **docs-readme:** add note about using admin methods with Netlify CLI ([#234](https://github.com/netlify/gotrue-js/issues/234)) ([5f3d504](https://github.com/netlify/gotrue-js/commit/5f3d504b3694610d56027bf40ef7fbf2f1f37eaa))
 
+## 1.0.0 (2022-01-03)
+
+
+### Bug Fixes
+
+* **docs-readme:** add note about using admin methods with Netlify CLI ([#234](https://github.com/netlify/gotrue-js/issues/234)) ([5f3d504](https://github.com/netlify/gotrue-js/commit/5f3d504b3694610d56027bf40ef7fbf2f1f37eaa))
+* **security:** don't log token on parsing errors ([#279](https://github.com/netlify/gotrue-js/issues/279)) ([1334f52](https://github.com/netlify/gotrue-js/commit/1334f5289a53f226defdea99d694788cfae290b5))
+* **types:** make signup data argument optional ([#165](https://github.com/netlify/gotrue-js/issues/165)) ([d1565a7](https://github.com/netlify/gotrue-js/commit/d1565a7d0576ff613b1c37c46a42d1fcbd720c7c))
+
 ### [0.9.29](https://www.github.com/netlify/gotrue-js/compare/v0.9.28...v0.9.29) (2021-01-28)
 
 
