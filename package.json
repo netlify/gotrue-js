@@ -1,7 +1,7 @@
 {
   "name": "gotrue-js",
   "description": "GoTrue API client for JavaScript",
-  "version": "0.9.29",
+  "version": "1.0.0",
   "author": "Mathias Biilmann Christensen",
   "bugs": "https://github.com/netlify/micro-api-client-lib/issues",
   "dependencies": {
