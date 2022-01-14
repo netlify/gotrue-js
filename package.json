@@ -41,7 +41,7 @@
   },
   "scripts": {
     "babelify": "browserify src/index.js -t [ babelify --presets [ @babel/preset-env ] --plugins [ @babel/plugin-proposal-object-rest-spread ] ] | uglifyjs > browser/gotrue.js",
-    "prepare": "run-s compile",
+    "prepare": "husky install node_modules/@netlify/eslint-config-node/.husky/ && run-s compile",
     "prepublishOnly": "run-s prepublishOnly:*",
     "prepublishOnly:checkout": "run-local \"git checkout main\"",
     "prepublishOnly:pull": "run-local \"git pull\"",
@@ -63,11 +63,5 @@
   "config": {
     "eslint": "--ignore-path .gitignore --cache --format=codeframe --max-warnings=0 \"{src,tests,.github}/**/*.{js,md,html}\"",
     "prettier": "--ignore-path .gitignore --loglevel=warn \"{src,tests,.github}/**/*.{js,md,yml,json,html}\" \"*.{js,yml,json,html}\" \".*.{js,yml,json,html}\" \"!package-lock.json\" \"!CHANGELOG.md\""
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm run format"
-    }
   }
 }
