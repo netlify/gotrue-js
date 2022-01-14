@@ -23,7 +23,7 @@ test('should parse token in ctor', (t) => {
   };
   const user = new User({}, tokenResponse, '');
 
-  t.is(user.token.expires_at, 1000000);
+  t.is(user.token.expires_at, 1_000_000);
 });
 
 test.serial('should not log token on error', (t) => {

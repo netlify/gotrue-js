@@ -98,7 +98,7 @@ export default class User {
       .catch((error) => {
         delete refreshPromises[refresh_token];
         this.clearSession();
-        return Promise.reject(error);
+        throw error;
       }));
   }
 
@@ -214,7 +214,7 @@ function urlBase64Decode(str) {
   const result = window.atob(output);
   try {
     return decodeURIComponent(escape(result));
-  } catch (error) {
+  } catch {
     return result;
   }
 }
