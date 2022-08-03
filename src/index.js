@@ -6,7 +6,7 @@ const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `/.netlify/identity`;
 
 export default class GoTrue {
-  constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false } = {}) {
+  constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false, config={} } = {}) {
     if (HTTPRegexp.test(APIUrl)) {
       console.warn(
         'Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.',
@@ -20,6 +20,8 @@ export default class GoTrue {
     this.setCookie = setCookie;
 
     this.api = new API(APIUrl);
+
+    this.config = config;
   }
 
   async _request(path, options = {}) {
@@ -62,7 +64,7 @@ export default class GoTrue {
         email,
       )}&password=${encodeURIComponent(password)}`,
     }).then((response) => {
-      User.removeSavedSession();
+      User.removeSavedSession(this.config);
       return this.createUser(response, remember);
     });
   }
@@ -102,7 +104,7 @@ export default class GoTrue {
 
   createUser(tokenResponse, remember = false) {
     this._setRememberHeaders(remember);
-    const user = new User(this.api, tokenResponse, this.audience);
+    const user = new User(this.api, tokenResponse, this.audience, this.config);
     return user.getUserData().then((userData) => {
       if (remember) {
         userData._saveSession();
