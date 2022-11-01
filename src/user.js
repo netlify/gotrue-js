@@ -113,10 +113,10 @@ export default class User {
     try {
       const token = await this.jwt();
       return await this.api.request(path, {
+        ...options,
         headers: Object.assign(options.headers, {
           Authorization: `Bearer ${token}`,
         }),
-        ...options,
       });
     } catch (error) {
       if (error instanceof JSONHTTPError && error.json) {
