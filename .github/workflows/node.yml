@@ -42,7 +42,7 @@ jobs:
           echo "::set-output name=os::${os/-latest/}"
           echo "::set-output name=node::node_${node//[.*]/}"
         shell: bash
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
         with:
           file: coverage/coverage-final.json
           flags: ${{ steps.test-coverage-flags.outputs.os }},${{ steps.test-coverage-flags.outputs.node }}
