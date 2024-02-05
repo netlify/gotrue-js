@@ -5,6 +5,13 @@
 
 * **docs-readme:** add note about using admin methods with Netlify CLI ([#234](https://github.com/netlify/gotrue-js/issues/234)) ([5f3d504](https://github.com/netlify/gotrue-js/commit/5f3d504b3694610d56027bf40ef7fbf2f1f37eaa))
 
+## 1.0.0 (2024-02-05)
+
+
+### Bug Fixes
+
+* husky binary not found ([0fdf7e8](https://github.com/netlify/gotrue-js/commit/0fdf7e810e3a5a54d36cc830b219f41cee5748fd))
+
 ### [0.9.29](https://www.github.com/netlify/gotrue-js/compare/v0.9.28...v0.9.29) (2021-01-28)
 
 
