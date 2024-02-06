@@ -39,8 +39,8 @@ jobs:
         run: |-
           os=${{ matrix.os }}
           node=${{ matrix.node-version }}
-          echo "::set-output name=os::${os/-latest/}"
-          echo "::set-output name=node::node_${node//[.*]/}"
+          echo "os=${os/-latest/}" >> "$GITHUB_OUTPUT"
+          echo "node=node_${node//[.*]/}" >> "$GITHUB_OUTPUT"
         shell: bash
       - uses: codecov/codecov-action@v2
         with:
