@@ -13,7 +13,7 @@
     "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
     "@babel/preset-env": "^7.11.5",
-    "@netlify/eslint-config-node": "^4.1.7",
+    "@netlify/eslint-config-node": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "ava": "^3.15.0",
