@@ -2,7 +2,7 @@ import API, { JSONHTTPError, type RequestOptions } from 'micro-api-client';
 
 import User, { type Token } from './user';
 
-export type { Token } from './user';
+export { default as User, type Token } from './user';
 export type { UserData, UserAttributes } from './admin';
 
 export interface GoTrueInit {
@@ -162,8 +162,6 @@ export default class GoTrue {
 if (typeof window !== 'undefined') {
   (window as typeof window & { GoTrue: typeof GoTrue }).GoTrue = GoTrue;
 }
-
-export { User };
 
 declare global {
   interface Window {

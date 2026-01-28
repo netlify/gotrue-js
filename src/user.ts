@@ -13,12 +13,13 @@ export interface Token {
 const ExpiryMargin = 60 * 1000;
 const storageKey = 'gotrue.user';
 const refreshPromises: Record<string, Promise<string>> = {};
-let currentUser: User | null = null;
 const forbiddenUpdateAttributes: Record<string, number> = { api: 1, token: 1, audience: 1, url: 1 };
 const forbiddenSaveAttributes: Record<string, number> = { api: 1 };
 const isBrowser = (): boolean => typeof window !== 'undefined';
 
 export default class User {
+  private static currentUser: User | null = null;
+
   api: API;
   url: string;
   audience?: string;
@@ -43,7 +44,7 @@ export default class User {
     this.url = api.apiURL;
     this.audience = audience;
     this._processTokenResponse(tokenResponse);
-    currentUser = this;
+    User.currentUser = this;
   }
 
   static removeSavedSession(): void {
@@ -51,8 +52,8 @@ export default class User {
   }
 
   static recoverSession(apiInstance?: API): User | null {
-    if (currentUser) {
-      return currentUser;
+    if (User.currentUser) {
+      return User.currentUser;
     }
 
     const json = isBrowser() && localStorage.getItem(storageKey);
@@ -120,7 +121,8 @@ export default class User {
         delete refreshPromises[refresh_token];
         this._processTokenResponse(response);
         this._refreshSavedSession();
-        return this.token!.access_token;
+        // Token is guaranteed to be set by _processTokenResponse
+        return (this.token as Token).access_token;
       })
       // eslint-disable-next-line promise/prefer-await-to-callbacks
       .catch((error: Error) => {
@@ -221,7 +223,7 @@ export default class User {
   clearSession(): void {
     User.removeSavedSession();
     this.token = null;
-    currentUser = null;
+    User.currentUser = null;
   }
 }
 
