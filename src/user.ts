@@ -1,6 +1,5 @@
-import API, { JSONHTTPError, type RequestOptions } from 'micro-api-client';
-
 import Admin, { type UserData } from './admin';
+import API, { JSONHTTPError, type RequestOptions } from './api';
 
 export interface Token {
   access_token: string;

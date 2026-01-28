@@ -1,5 +1,4 @@
-import API, { JSONHTTPError, type RequestOptions } from 'micro-api-client';
-
+import API, { JSONHTTPError, type RequestOptions } from './api';
 import User, { type Token } from './user';
 
 export { default as User, type Token } from './user';
