@@ -185,7 +185,9 @@ export default class User {
   _processTokenResponse(tokenResponse: Token): void {
     this.token = tokenResponse;
     try {
-      const claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split('.')[1])) as { exp: number };
+      const claims = JSON.parse(urlBase64Decode(tokenResponse.access_token.split('.')[1])) as {
+        exp: number;
+      };
       this.token.expires_at = claims.exp * 1000;
     } catch (error) {
       console.error(new Error(`Gotrue-js: Failed to parse tokenResponse claims: ${error}`));
