@@ -8,23 +8,18 @@
     "micro-api-client": "^3.2.1"
   },
   "devDependencies": {
-    "@ava/babel": "^2.0.0",
     "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
     "@babel/preset-env": "^7.11.5",
-    "@netlify/eslint-config-node": "^4.1.7",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "ava": "^3.15.0",
+    "@netlify/eslint-config-node": "^5.0.0",
+    "@vitest/coverage-v8": "^4.0.0",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
-    "esm": "^3.2.25",
-    "husky": "^7.0.4",
-    "nyc": "^17.0.0",
-    "sinon": "^12.0.0",
+    "husky": "^9.0.0",
     "typescript": "^5.0.0",
-    "uglify-js": "^3.0.0"
+    "uglify-js": "^3.0.0",
+    "vitest": "^4.0.0"
   },
   "homepage": "https://github.com/netlify/gotrue-js",
   "keywords": [
@@ -58,8 +53,8 @@
     "format:check-fix:prettier": "run-e format:check:prettier format:fix:prettier",
     "format:check:prettier": "cross-env-shell prettier --check $npm_package_config_prettier",
     "format:fix:prettier": "cross-env-shell prettier --write $npm_package_config_prettier",
-    "test:dev": "ava",
-    "test:ci": "nyc -r lcovonly -r text -r json ava"
+    "test:dev": "vitest run",
+    "test:ci": "vitest run --coverage"
   },
   "config": {
     "eslint": "--ignore-path .gitignore --cache --format=codeframe --max-warnings=0 \"{src,tests,.github}/**/*.{js,md,html}\"",

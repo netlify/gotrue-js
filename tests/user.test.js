@@ -1,14 +1,13 @@
 import { Buffer } from 'buffer';
 
-import test from 'ava';
-import { spy } from 'sinon';
+import { test, expect, vi } from 'vitest';
 
 import User from '../src/user';
 
 // mock window
 global.window = { atob: (base64) => Buffer.from(base64, 'base64').toString('ascii') };
 
-test('should parse token in ctor', (t) => {
+test('should parse token in ctor', () => {
   //
   // {
   // "sub": "1234567890",
@@ -23,11 +22,11 @@ test('should parse token in ctor', (t) => {
   };
   const user = new User({}, tokenResponse, '');
 
-  t.is(user.token.expires_at, 1_000_000);
+  expect(user.token.expires_at).toBe(1_000_000);
 });
 
-test.serial('should not log token on error', (t) => {
-  const errorSpy = spy(console, 'error');
+test('should not log token on error', () => {
+  const errorSpy = vi.spyOn(console, 'error');
   const tokenResponse = {
     access_token: 'header.invalid.secret',
   };
@@ -35,8 +34,8 @@ test.serial('should not log token on error', (t) => {
   // eslint-disable-next-line no-new
   new User({}, tokenResponse, '');
 
-  t.assert(errorSpy.calledOnce);
-  const [error] = errorSpy.getCall(0).args;
-  t.true(error instanceof Error);
-  t.false(error.message.includes(tokenResponse.access_token));
+  expect(errorSpy).toHaveBeenCalledOnce();
+  const [[error]] = errorSpy.mock.calls;
+  expect(error).toBeInstanceOf(Error);
+  expect(error.message).not.toContain(tokenResponse.access_token);
 });
