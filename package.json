@@ -5,17 +5,11 @@
   "author": "Mathias Biilmann Christensen",
   "bugs": "https://github.com/netlify/micro-api-client-lib/issues",
   "devDependencies": {
-    "@babel/cli": "^7.11.6",
-    "@babel/core": "^7.11.6",
-    "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
-    "@babel/preset-env": "^7.11.5",
     "@netlify/eslint-config-node": "^7.0.1",
     "@vitest/coverage-v8": "^4.0.0",
-    "babelify": "^10.0.0",
-    "browserify": "^17.0.0",
+    "esbuild": "^0.27.2",
     "husky": "^9.0.0",
     "typescript": "^5.0.0",
-    "uglify-js": "^3.0.0",
     "vitest": "^4.0.0"
   },
   "homepage": "https://github.com/netlify/gotrue-js",
@@ -33,7 +27,7 @@
     "url": "git+https://github.com/netlify/gotrue-js.git"
   },
   "scripts": {
-    "babelify": "browserify lib/index.js -t [ babelify --presets [ @babel/preset-env ] --plugins [ @babel/plugin-proposal-object-rest-spread ] ] | uglifyjs > browser/gotrue.js",
+    "bundle": "esbuild lib/index.js --bundle --minify --format=iife --global-name=GoTrue --outfile=browser/gotrue.js",
     "prepare": "husky install node_modules/@netlify/eslint-config-node/.husky/ && run-s compile",
     "prepublishOnly": "run-s prepublishOnly:*",
     "prepublishOnly:checkout": "run-local \"git checkout main\"",
