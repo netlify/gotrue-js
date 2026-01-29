@@ -34,11 +34,11 @@ export default class Admin {
   }
 
   getUser(user: UserData): Promise<UserData> {
-    return this.user._request(`/admin/users/${user.id}`);
+    return this.user._request(`/admin/users/${encodeURIComponent(user.id)}`);
   }
 
   updateUser(user: UserData, attributes: UserAttributes = {}): Promise<UserData> {
-    return this.user._request(`/admin/users/${user.id}`, {
+    return this.user._request(`/admin/users/${encodeURIComponent(user.id)}`, {
       method: 'PUT',
       body: JSON.stringify(attributes),
     });
@@ -54,7 +54,7 @@ export default class Admin {
   }
 
   deleteUser(user: UserData): Promise<void> {
-    return this.user._request(`/admin/users/${user.id}`, {
+    return this.user._request(`/admin/users/${encodeURIComponent(user.id)}`, {
       method: 'DELETE',
     });
   }

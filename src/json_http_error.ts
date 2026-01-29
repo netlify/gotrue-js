@@ -11,8 +11,10 @@ export class JSONHTTPError extends HTTPError {
   json: APIErrorJson;
 
   constructor(status: number, json: APIErrorJson) {
-    super(status, JSON.stringify(json));
+    const message = json.msg || json.error || JSON.stringify(json);
+    super(status, message);
     this.json = json;
     this.name = 'JSONHTTPError';
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

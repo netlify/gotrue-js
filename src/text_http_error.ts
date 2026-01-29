@@ -7,5 +7,6 @@ export class TextHTTPError extends HTTPError {
     super(status, data);
     this.data = data;
     this.name = 'TextHTTPError';
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
