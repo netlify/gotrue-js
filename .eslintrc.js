@@ -10,6 +10,14 @@ module.exports = {
     node: true,
     es6: true,
   },
+  settings: {
+    // Tell eslint-plugin-n to resolve TypeScript extensions
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.ts'],
+      },
+    },
+  },
   rules: {
     // eslint-plugin-ava needs to know where test files are located
     'ava/no-ignored-test-files': [2, { files: ['tests/**/*.js'] }],
@@ -37,9 +45,15 @@ module.exports = {
     'promise/prefer-await-to-then': 0,
     'promise/no-return-wrap': 0,
     'promise/no-nesting': 0,
-    'node/no-unsupported-features/es-syntax': 0,
     camelcase: 0,
     'unicorn/prefer-prototype-methods': 0,
+
+    // Disable node version checks - this is a browser library
+    'node/no-unsupported-features/es-syntax': 0,
+    'n/no-unsupported-features/es-syntax': 0,
+
+    // Disable missing import for TypeScript (handled by TypeScript compiler)
+    'n/no-missing-import': 0,
   },
   overrides: [
     ...overrides,
@@ -54,11 +68,26 @@ module.exports = {
         'plugin:import/warnings',
         'plugin:import/typescript',
       ],
+      settings: {
+        'import/resolver': {
+          typescript: {
+            alwaysTryTypes: true,
+            project: './tsconfig.json',
+          },
+        },
+      },
+      rules: {
+        // Disable no-use-before-define for class self-references
+        'no-use-before-define': 0,
+        '@typescript-eslint/no-use-before-define': 0,
+      },
     },
     {
       files: ['tests/**/*.js'],
       rules: {
         'node/no-unpublished-import': 0,
+        'n/no-unpublished-import': 0,
+        'n/no-missing-import': 0,
       },
     },
     {
@@ -66,6 +95,7 @@ module.exports = {
       files: ['README.md'],
       rules: {
         'node/no-missing-import': 0,
+        'n/no-missing-import': 0,
         'no-console': 0,
         'promise/always-return': 0,
         'require-await': 0,
