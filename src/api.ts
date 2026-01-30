@@ -49,7 +49,8 @@ export default class API {
 
   constructor(apiURL?: string, options?: { defaultHeaders?: Record<string, string> }) {
     this.apiURL = apiURL || '';
-    this._sameOrigin = /\/[^/]?/.test(this.apiURL);
+    // Match relative URLs (start with / but not //) - these are same-origin
+    this._sameOrigin = /^\/(?!\/)/.test(this.apiURL);
     this.defaultHeaders = options?.defaultHeaders || {};
   }
 

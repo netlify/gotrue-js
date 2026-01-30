@@ -323,3 +323,153 @@ test('_request should enhance JSONHTTPError with error and error_description', a
 
   await expect(auth._request('/token')).rejects.toThrow('invalid_grant: Invalid credentials');
 });
+
+// signup() return type tests
+test('signup should return SignupResponse (not User instance)', async () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+  const signupResponse = {
+    id: 'user-123',
+    email: 'test@example.com',
+    confirmation_sent_at: '2024-01-01T00:00:00Z',
+  };
+  mockFetch.mockResolvedValue(createMockResponse({ body: signupResponse }));
+
+  const result = await auth.signup('test@example.com', 'password123');
+
+  // Result should be plain object, not User instance
+  expect(result).toEqual(signupResponse);
+  expect(result).not.toBeInstanceOf(User);
+  expect(result.id).toBe('user-123');
+  expect(result.email).toBe('test@example.com');
+  expect(result.confirmation_sent_at).toBe('2024-01-01T00:00:00Z');
+});
+
+// login() tests
+test('login should POST to /token and return User instance', async () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+  const tokenResponse = createTokenResponse();
+
+  mockFetch
+    .mockResolvedValueOnce(createMockResponse({ body: tokenResponse }))
+    .mockResolvedValueOnce(
+      createMockResponse({
+        body: { id: 'user-123', email: 'test@example.com' },
+      }),
+    );
+
+  const user = await auth.login('test@example.com', 'password123');
+
+  expect(mockFetch).toHaveBeenCalledWith(
+    'https://example.com/token',
+    expect.objectContaining({
+      method: 'POST',
+      headers: expect.objectContaining({
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }),
+    }),
+  );
+  expect(user).toBeInstanceOf(User);
+  expect(user.email).toBe('test@example.com');
+});
+
+test('login should save session when remember is true', async () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+  const tokenResponse = createTokenResponse();
+
+  mockFetch
+    .mockResolvedValueOnce(createMockResponse({ body: tokenResponse }))
+    .mockResolvedValueOnce(
+      createMockResponse({
+        body: { id: 'user-123', email: 'test@example.com' },
+      }),
+    );
+
+  await auth.login('test@example.com', 'password123', true);
+
+  expect(localStorageMock.setItem).toHaveBeenCalled();
+});
+
+// confirm() tests
+test('confirm should verify signup token', async () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+  const tokenResponse = createTokenResponse();
+
+  mockFetch
+    .mockResolvedValueOnce(createMockResponse({ body: tokenResponse }))
+    .mockResolvedValueOnce(
+      createMockResponse({
+        body: { id: 'user-123', email: 'test@example.com' },
+      }),
+    );
+
+  const user = await auth.confirm('confirmation-token');
+
+  expect(mockFetch).toHaveBeenCalledWith(
+    'https://example.com/verify',
+    expect.objectContaining({
+      body: JSON.stringify({ token: 'confirmation-token', type: 'signup' }),
+    }),
+  );
+  expect(user).toBeInstanceOf(User);
+});
+
+// recover() tests
+test('recover should verify recovery token', async () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+  const tokenResponse = createTokenResponse();
+
+  mockFetch
+    .mockResolvedValueOnce(createMockResponse({ body: tokenResponse }))
+    .mockResolvedValueOnce(
+      createMockResponse({
+        body: { id: 'user-123', email: 'test@example.com' },
+      }),
+    );
+
+  const user = await auth.recover('recovery-token');
+
+  expect(mockFetch).toHaveBeenCalledWith(
+    'https://example.com/verify',
+    expect.objectContaining({
+      body: JSON.stringify({ token: 'recovery-token', type: 'recovery' }),
+    }),
+  );
+  expect(user).toBeInstanceOf(User);
+});
+
+// acceptInvite() tests
+test('acceptInvite should POST with password and return User', async () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+  const tokenResponse = createTokenResponse();
+
+  mockFetch
+    .mockResolvedValueOnce(createMockResponse({ body: tokenResponse }))
+    .mockResolvedValueOnce(
+      createMockResponse({
+        body: { id: 'user-123', email: 'invited@example.com' },
+      }),
+    );
+
+  const user = await auth.acceptInvite('invite-token', 'new-password');
+
+  expect(mockFetch).toHaveBeenCalledWith(
+    'https://example.com/verify',
+    expect.objectContaining({
+      body: JSON.stringify({ token: 'invite-token', password: 'new-password', type: 'signup' }),
+    }),
+  );
+  expect(user).toBeInstanceOf(User);
+});
+
+// OAuth URL generation tests
+test('loginExternalUrl should work with various providers', () => {
+  const auth = new GoTrue({ APIUrl: 'https://example.com' });
+
+  expect(auth.loginExternalUrl('github')).toBe('https://example.com/authorize?provider=github');
+  expect(auth.loginExternalUrl('google')).toBe('https://example.com/authorize?provider=google');
+  expect(auth.loginExternalUrl('facebook')).toBe('https://example.com/authorize?provider=facebook');
+  expect(auth.loginExternalUrl('gitlab')).toBe('https://example.com/authorize?provider=gitlab');
+  expect(auth.loginExternalUrl('bitbucket')).toBe(
+    'https://example.com/authorize?provider=bitbucket',
+  );
+});

@@ -201,3 +201,128 @@ test('admin getter should return Admin instance', () => {
   expect(admin).toBeDefined();
   expect(admin.constructor.name).toBe('Admin');
 });
+
+// Token refresh tests
+test('jwt should trigger refresh when token is expired', async () => {
+  // Token expired 1 hour ago
+  const pastExp = Date.now() / 1000 - 3600;
+  const token = createValidToken(pastExp);
+  const user = new User(mockApi, token, '');
+
+  const newToken = createValidToken(Date.now() / 1000 + 3600);
+  mockApi.request.mockResolvedValueOnce(newToken);
+
+  const jwt = await user.jwt();
+
+  expect(mockApi.request).toHaveBeenCalledWith(
+    '/token',
+    expect.objectContaining({
+      method: 'POST',
+      body: expect.stringContaining('grant_type=refresh_token'),
+    }),
+  );
+  expect(jwt).toBe(newToken.access_token);
+});
+
+test('jwt should trigger refresh when forceRefresh is true', async () => {
+  const futureExp = Date.now() / 1000 + 3600;
+  const token = createValidToken(futureExp);
+  const user = new User(mockApi, token, '');
+
+  const newToken = createValidToken(Date.now() / 1000 + 7200);
+  mockApi.request.mockResolvedValueOnce(newToken);
+
+  const jwt = await user.jwt(true);
+
+  expect(mockApi.request).toHaveBeenCalled();
+  expect(jwt).toBe(newToken.access_token);
+});
+
+test('jwt should deduplicate concurrent refresh requests', async () => {
+  const pastExp = Date.now() / 1000 - 3600;
+  const token = createValidToken(pastExp);
+  const user = new User(mockApi, token, '');
+
+  const newToken = createValidToken(Date.now() / 1000 + 3600);
+  mockApi.request.mockResolvedValueOnce(newToken);
+
+  // Trigger multiple concurrent refreshes
+  const [jwt1, jwt2, jwt3] = await Promise.all([user.jwt(), user.jwt(), user.jwt()]);
+
+  // Should only call API once due to deduplication
+  expect(mockApi.request).toHaveBeenCalledTimes(1);
+  expect(jwt1).toBe(newToken.access_token);
+  expect(jwt2).toBe(newToken.access_token);
+  expect(jwt3).toBe(newToken.access_token);
+});
+
+test('refresh failure should clear session', async () => {
+  const pastExp = Date.now() / 1000 - 3600;
+  const token = createValidToken(pastExp);
+  const user = new User(mockApi, token, '');
+  user._saveSession();
+
+  mockApi.request.mockRejectedValueOnce(new Error('Invalid refresh token'));
+
+  await expect(user.jwt()).rejects.toThrow('Invalid refresh token');
+  expect(user.token).toBeNull();
+  expect(localStorageMock.removeItem).toHaveBeenCalledWith('gotrue.user');
+});
+
+// Logout tests
+test('logout should call /logout and clear session', async () => {
+  const token = createValidToken(Date.now() / 1000 + 3600);
+  const user = new User(mockApi, token, '');
+  user._saveSession();
+
+  mockApi.request.mockResolvedValueOnce(null);
+
+  await user.logout();
+
+  expect(mockApi.request).toHaveBeenCalledWith(
+    '/logout',
+    expect.objectContaining({
+      method: 'POST',
+    }),
+  );
+  expect(user.token).toBeNull();
+  expect(localStorageMock.removeItem).toHaveBeenCalledWith('gotrue.user');
+});
+
+test('logout should clear session even if API call fails', async () => {
+  const token = createValidToken(Date.now() / 1000 + 3600);
+  const user = new User(mockApi, token, '');
+  user._saveSession();
+
+  mockApi.request.mockRejectedValueOnce(new Error('Network error'));
+
+  await user.logout();
+
+  // Session should still be cleared despite error
+  expect(user.token).toBeNull();
+  expect(localStorageMock.removeItem).toHaveBeenCalledWith('gotrue.user');
+});
+
+// Update tests
+test('update should PUT to /user and save user data', async () => {
+  const token = createValidToken(Date.now() / 1000 + 3600);
+  const user = new User(mockApi, token, '');
+  user.id = 'user-123';
+
+  mockApi.request.mockResolvedValueOnce({
+    id: 'user-123',
+    email: 'updated@example.com',
+    user_metadata: { name: 'Updated Name' },
+  });
+
+  const result = await user.update({ user_metadata: { name: 'Updated Name' } });
+
+  expect(mockApi.request).toHaveBeenCalledWith(
+    '/user',
+    expect.objectContaining({
+      method: 'PUT',
+      body: JSON.stringify({ user_metadata: { name: 'Updated Name' } }),
+    }),
+  );
+  expect(result.email).toBe('updated@example.com');
+});

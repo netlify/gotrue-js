@@ -109,12 +109,18 @@ export default class User {
       return existingPromise;
     }
 
-    const promise = this.api
-      .request<Token>('/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `grant_type=refresh_token&refresh_token=${refresh_token}`,
-      })
+    const refreshRequest = this.api.request<Token>('/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=refresh_token&refresh_token=${refresh_token}`,
+    });
+
+    // Add 30 second timeout to prevent hanging indefinitely
+    const timeoutPromise = new Promise<never>((_resolve, reject) => {
+      setTimeout(() => reject(new Error('Token refresh timeout')), 30_000);
+    });
+
+    const promise = Promise.race([refreshRequest, timeoutPromise])
       .then((response) => {
         delete refreshPromises[refresh_token];
         this._processTokenResponse(response);

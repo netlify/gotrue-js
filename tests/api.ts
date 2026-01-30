@@ -58,11 +58,41 @@ test('should initialize with default headers', () => {
   expect(api.defaultHeaders).toEqual({ 'X-Custom': 'value' });
 });
 
-test('should detect same-origin URLs', () => {
+test('should detect same-origin URLs starting with /', async () => {
   const api = new API('/api');
+  mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
 
-  // _sameOrigin is private but we can test its effect through credentials
-  expect(api.apiURL).toBe('/api');
+  await api.request('/test');
+
+  // Same-origin URLs should include credentials
+  expect(mockFetch).toHaveBeenCalledWith(
+    expect.any(String),
+    expect.objectContaining({
+      credentials: 'same-origin',
+    }),
+  );
+});
+
+test('should NOT treat absolute URLs as same-origin', async () => {
+  const api = new API('https://example.com/api');
+  mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
+
+  await api.request('/test');
+
+  // Absolute URLs should NOT include credentials
+  const callArgs = mockFetch.mock.calls[0];
+  expect(callArgs[1].credentials).toBeUndefined();
+});
+
+test('should NOT treat protocol-relative URLs as same-origin', async () => {
+  const api = new API('//other-domain.com/api');
+  mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
+
+  await api.request('/test');
+
+  // Protocol-relative URLs are cross-origin
+  const callArgs = mockFetch.mock.calls[0];
+  expect(callArgs[1].credentials).toBeUndefined();
 });
 
 // Request tests

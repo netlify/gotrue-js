@@ -26,6 +26,14 @@ export interface Settings {
   };
 }
 
+export interface SignupResponse {
+  id: string;
+  email: string;
+  confirmation_sent_at?: string;
+  confirmed_at?: string;
+  [key: string]: unknown;
+}
+
 const HTTPRegexp = /^http:\/\//;
 const defaultApiURL = `/.netlify/identity`;
 
@@ -73,7 +81,7 @@ export default class GoTrue {
     return this._request<Settings>('/settings');
   }
 
-  signup(email: string, password: string, data?: Record<string, unknown>): Promise<User> {
+  signup(email: string, password: string, data?: Record<string, unknown>): Promise<SignupResponse> {
     return this._request('/signup', {
       method: 'POST',
       body: JSON.stringify({ email, password, data }),
