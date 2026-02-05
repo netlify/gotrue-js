@@ -237,7 +237,6 @@ function base64Decode(base64: string): string {
     return atob(base64);
   }
   // Node.js environment - use Buffer
-  // eslint-disable-next-line n/prefer-global/buffer
   return Buffer.from(base64, 'base64').toString('binary');
 }
 

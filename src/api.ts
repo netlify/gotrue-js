@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 export class HTTPError extends Error {
   status: number;
 
@@ -32,7 +31,6 @@ export class JSONHTTPError extends HTTPError {
     this.json = json;
   }
 }
-/* eslint-enable max-classes-per-file */
 
 export interface RequestOptions {
   method?: string;

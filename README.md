@@ -42,16 +42,15 @@ If an error occurs during the request, the promise may be rejected with an `Erro
 ```js
 import GoTrue, { HTTPError, JSONHTTPError, TextHTTPError } from 'gotrue-js';
 
-auth.login(email, password)
-  .catch((error) => {
-    if (error instanceof JSONHTTPError) {
-      console.log('JSON error:', error.json);
-    } else if (error instanceof TextHTTPError) {
-      console.log('Text error:', error.data);
-    } else if (error instanceof HTTPError) {
-      console.log('HTTP error:', error.status);
-    }
-  });
+auth.login(email, password).catch((error) => {
+  if (error instanceof JSONHTTPError) {
+    console.log('JSON error:', error.json);
+  } else if (error instanceof TextHTTPError) {
+    console.log('Text error:', error.data);
+  } else if (error instanceof HTTPError) {
+    console.log('HTTP error:', error.status);
+  }
+});
 ```
 
 ## Authentication examples
@@ -505,7 +504,7 @@ exports.handler = async (event, context) => {
   const { identity, user } = context.clientContext;
   const userID = user.sub;
   const userUrl = `${identity.url}/admin/users/{${userID}}`;
-  const adminAuthHeader = `Bearer ${  identity.token}`;
+  const adminAuthHeader = `Bearer ${identity.token}`;
 
   try {
     return fetch(userUrl, {
@@ -521,12 +520,12 @@ exports.handler = async (event, context) => {
         console.log('Failed to get user! 500! Internal.');
         return {
           statusCode: 500,
-          body: `Internal Server Error: ${  error}`,
+          body: `Internal Server Error: ${error}`,
         };
       });
   } catch (error) {
     console.log('GOT HERE! 500! outer');
-    return { statusCode: 500, body: `Internal Server Error: ${  error}` };
+    return { statusCode: 500, body: `Internal Server Error: ${error}` };
   }
 };
 ```
@@ -604,9 +603,7 @@ Example response object:
     "confirmed_at": "2018-05-09T06:52:58Z",
     "app_metadata": {
       "provider": "email",
-      "roles": [
-        "superstar"
-      ]
+      "roles": ["superstar"]
     },
     "user_metadata": {},
     "created_at": "2018-05-09T06:52:58Z",
@@ -770,9 +767,9 @@ exports.handler = async (event, context) => {
         return { statusCode: 204 };
       })
       .catch((error) => ({
-          statusCode: 500,
-          body: `Internal Server Error: ${error}`,
-        }));
+        statusCode: 500,
+        body: `Internal Server Error: ${error}`,
+      }));
   } catch (error) {
     return error;
   }
@@ -819,9 +816,9 @@ exports.handler = async (event, context) => {
         return { statusCode: 204 };
       })
       .catch((error) => ({
-          statusCode: 500,
-          body: `Internal Server Error: ${error}`,
-        }));
+        statusCode: 500,
+        body: `Internal Server Error: ${error}`,
+      }));
   } catch (error) {
     return error;
   }
@@ -867,9 +864,7 @@ Example response object:
       "confirmed_at": "2018-05-09T06:28:46Z",
       "app_metadata": {
         "provider": "email",
-        "roles": [
-          "admin"
-        ]
+        "roles": ["admin"]
       },
       "user_metadata": {},
       "created_at": "2018-05-09T06:28:46Z",
