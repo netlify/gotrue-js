@@ -1,4 +1,5 @@
 lib/
+browser/
 node_modules/
 .eslintcache
 .nyc_output
