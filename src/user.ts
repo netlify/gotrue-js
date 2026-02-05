@@ -21,7 +21,7 @@ export default class User {
   api: API;
   url: string;
   audience: string;
-  token!: Token;
+  token: Token | null = null;
   _fromStorage?: boolean;
 
   // Dynamic properties from user data
@@ -125,6 +125,9 @@ export default class User {
         delete refreshPromises[refresh_token];
         this._processTokenResponse(response);
         this._refreshSavedSession();
+        if (!this.token) {
+          throw new Error('Gotrue-js: Token not set after refresh');
+        }
         return this.token.access_token;
       })
       .catch((error) => {
@@ -217,15 +220,25 @@ export default class User {
     return this;
   }
 
-  tokenDetails(): Token {
+  tokenDetails(): Token | null {
     return this.token;
   }
 
   clearSession(): void {
     User.removeSavedSession();
-    this.token = null as unknown as Token;
+    this.token = null;
     currentUser = null;
   }
+}
+
+// Decode base64 - works in browser (atob) and Node.js (Buffer)
+function base64Decode(base64: string): string {
+  if (typeof atob === 'function') {
+    return atob(base64);
+  }
+  // Node.js environment - use Buffer
+  // eslint-disable-next-line n/prefer-global/buffer
+  return Buffer.from(base64, 'base64').toString('binary');
 }
 
 function urlBase64Decode(str: string): string {
@@ -245,7 +258,7 @@ function urlBase64Decode(str: string): string {
   }
 
   // Decode base64 to binary string, then convert to UTF-8
-  const binaryString = window.atob(output);
+  const binaryString = base64Decode(output);
   try {
     const bytes = Uint8Array.from(binaryString, (char) => char.codePointAt(0) ?? 0);
     return new TextDecoder().decode(bytes);

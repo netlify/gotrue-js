@@ -141,6 +141,7 @@ test('clearSession should remove saved session and null token', () => {
 
   expect(localStorageMock.removeItem).toHaveBeenCalledWith('gotrue.user');
   expect(user.token).toBeNull();
+  expect(user.tokenDetails()).toBeNull();
 });
 
 test('jwt should return access_token when not expired', async () => {
