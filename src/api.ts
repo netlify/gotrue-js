@@ -70,6 +70,10 @@ export default class API {
 
   async request<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
     const headers = this.headers(options.headers || {});
+    // Only include Content-Type for requests with a body
+    if (!options.body) {
+      delete headers['Content-Type'];
+    }
     const fetchOptions: RequestInit = {
       ...options,
       headers,

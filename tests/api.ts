@@ -105,11 +105,11 @@ test('should make GET request with correct URL', async () => {
   expect(mockFetch).toHaveBeenCalledWith('https://example.com/users', expect.any(Object));
 });
 
-test('should include Content-Type header by default', async () => {
+test('should include Content-Type header when body is present', async () => {
   const api = new API('https://example.com');
   mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
 
-  await api.request('/test');
+  await api.request('/test', { body: JSON.stringify({ data: 'test' }) });
 
   expect(mockFetch).toHaveBeenCalledWith(
     expect.any(String),
@@ -121,13 +121,26 @@ test('should include Content-Type header by default', async () => {
   );
 });
 
+test('should not include Content-Type header for requests without body', async () => {
+  const api = new API('https://example.com');
+  mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
+
+  await api.request('/test');
+
+  const [, options] = mockFetch.mock.calls[0];
+  expect(options.headers['Content-Type']).toBeUndefined();
+});
+
 test('should merge default headers with request headers', async () => {
   const api = new API('https://example.com', {
     defaultHeaders: { 'X-Default': 'default-value' },
   });
   mockFetch.mockResolvedValue(createMockResponse({ body: {} }));
 
-  await api.request('/test', { headers: { 'X-Custom': 'custom-value' } });
+  await api.request('/test', {
+    headers: { 'X-Custom': 'custom-value' },
+    body: JSON.stringify({ data: 'test' }),
+  });
 
   expect(mockFetch).toHaveBeenCalledWith(
     expect.any(String),
@@ -147,6 +160,7 @@ test('should allow overriding Content-Type header', async () => {
 
   await api.request('/test', {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'key=value',
   });
 
   expect(mockFetch).toHaveBeenCalledWith(

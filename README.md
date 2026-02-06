@@ -29,11 +29,13 @@ auth = new GoTrue({
 
 ### GoTrue configuration
 
-APIUrl: The absolute path of the GoTrue endpoint. To find the `APIUrl`, go to `Identity` page of your Netlify site dashboard.
+APIUrl: The absolute path of the GoTrue endpoint. To find the `APIUrl`, go to your Netlify site dashboard and navigate to **Project configuration > Identity**. The URL will be `https://<your-site>.netlify.app/.netlify/identity`.
 
 audience(optional): `audience` is one of the pre-defined [JWT payload](https://tools.ietf.org/html/rfc7519#section-4.1.3) claims. It's an optional attribute which is set to be empty by default. If you were hosting your own identity service and wanted to support [multitenancy](https://en.wikipedia.org/wiki/Multitenancy), you would need `audience` to separate the users.
 
-setCookie(optional): set to be `false` by default. If you wish to implement the `remember me` functionality, set the value to be `true`.
+setCookie(optional): set to `false` by default. When set to `true`, the library sends an `X-Use-Cookie` header with requests, which tells the GoTrue server to set HttpOnly cookies containing the authentication tokens. This is more secure than localStorage alone because HttpOnly cookies cannot be accessed by JavaScript (protecting against XSS attacks).
+
+**Remember me:** The `login()`, `confirm()`, and `recover()` methods accept an optional `remember` boolean parameter. When `remember` is `true` and `setCookie` is enabled, the server sets longer-lived session cookies. When `false`, the cookies expire when the browser session ends.
 
 ### Error handling
 
@@ -297,9 +299,18 @@ Example response object:
 
 ### Get current user
 
-This function returns the current user object when a user is logged in
+This function returns the current user object when a user is logged in. The user data is recovered from localStorage, so it may be stale if the user's profile was updated elsewhere.
 
 `auth.currentUser()`
+
+To fetch fresh user data from the server, call `getUserData()` on the user object:
+
+```js
+const user = auth.currentUser();
+if (user) {
+  await user.getUserData(); // Fetches and updates user data from server
+}
+```
 
 Example usage:
 
@@ -395,9 +406,11 @@ Example response object:
 
 ### Get a JWT token
 
-This function retrieves a JWT token from a currently logged in user
+This function retrieves a JWT token from a currently logged in user.
 
 `user.jwt(forceRefresh)`
+
+**When to call `.jwt()`:** Call this method before making authenticated API requests to your backend. The method automatically refreshes the token if it's expired (tokens expire after 1 hour by default), so you don't need to manually track expiration. Pass `true` to force a refresh even if the token hasn't expired.
 
 Example usage:
 
@@ -417,6 +430,34 @@ Example response object:
 ```bash
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjUyMTk4MTYsInN1YiI6ImE5NG.98YDkB6B9JbBlDlqqef2nme2tkAnsi30QVys9aevdCw debugger eval code:1:43
 ```
+
+### Token refresh flow
+
+When a user logs in, they receive two tokens:
+
+- **Access token** (`access_token`): A short-lived JWT (1 hour by default) used to authenticate API requests
+- **Refresh token** (`refresh_token`): A longer-lived token used to obtain new access tokens
+
+The `.jwt()` method handles token refresh automatically:
+
+1. If the access token is still valid, it returns immediately
+2. If the access token has expired, it uses the refresh token to obtain a new one
+3. The new tokens are stored and the fresh access token is returned
+
+You don't need to manually track expiration or refresh tokens — just call `.jwt()` before each authenticated request:
+
+```js
+async function fetchProtectedData() {
+  const user = auth.currentUser();
+  const token = await user.jwt(); // Automatically refreshes if needed
+
+  return fetch('/api/protected', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+```
+
+If the refresh token is invalid or expired (e.g., user was logged out on another device), the `.jwt()` call will fail and the session will be cleared.
 
 ### Logout a user
 

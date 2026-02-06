@@ -47,8 +47,10 @@ const createValidToken = (exp: number): Token => ({
 const mockApi = {
   apiURL: 'https://example.com/.netlify/identity',
   defaultHeaders: {},
+  _sameOrigin: false,
+  headers: () => ({ 'Content-Type': 'application/json' }),
   request: vi.fn(),
-};
+} as unknown as import('../src/api').default & { request: ReturnType<typeof vi.fn> };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -63,19 +65,21 @@ test('should parse token expiry from JWT claims', () => {
   const tokenResponse = {
     access_token:
       'header.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjEwMDB9.secret',
+    expires_at: 0, // will be overwritten by _processTokenResponse
     expires_in: 3600,
     refresh_token: 'refresh',
     token_type: 'bearer' as const,
   };
   const user = new User(mockApi, tokenResponse, '');
 
-  expect(user.token.expires_at).toBe(1_000_000);
+  expect(user.token!.expires_at).toBe(1_000_000);
 });
 
 test('should not log token on parsing error', () => {
   const errorSpy = vi.spyOn(console, 'error');
   const tokenResponse = {
     access_token: 'header.invalid.secret',
+    expires_at: 0,
     expires_in: 3600,
     refresh_token: 'refresh',
     token_type: 'bearer' as const,
@@ -128,8 +132,8 @@ test('tokenDetails should return current token', () => {
 
   const details = user.tokenDetails();
 
-  expect(details.access_token).toBe(token.access_token);
-  expect(details.refresh_token).toBe(token.refresh_token);
+  expect(details!.access_token).toBe(token.access_token);
+  expect(details!.refresh_token).toBe(token.refresh_token);
 });
 
 test('clearSession should remove saved session and null token', () => {
@@ -237,6 +241,25 @@ test('jwt should trigger refresh when forceRefresh is true', async () => {
 
   expect(mockApi.request).toHaveBeenCalled();
   expect(jwt).toBe(newToken.access_token);
+});
+
+test('jwt(true) should update tokenDetails after refresh (#71)', async () => {
+  const futureExp = Date.now() / 1000 + 3600;
+  const oldToken = createValidToken(futureExp);
+  const user = new User(mockApi, oldToken, '');
+
+  // Verify initial token
+  expect(user.tokenDetails()?.access_token).toBe(oldToken.access_token);
+
+  const newToken = createValidToken(Date.now() / 1000 + 7200);
+  mockApi.request.mockResolvedValueOnce(newToken);
+
+  await user.jwt(true);
+
+  // Verify token is updated on the user instance
+  const updatedDetails = user.tokenDetails();
+  expect(updatedDetails?.access_token).toBe(newToken.access_token);
+  expect(updatedDetails?.refresh_token).toBe(newToken.refresh_token);
 });
 
 test('jwt should deduplicate concurrent refresh requests', async () => {

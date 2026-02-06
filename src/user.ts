@@ -34,6 +34,7 @@ export default class User {
   created_at!: string;
   updated_at!: string;
   confirmed_at!: string;
+  new_email?: string;
   [key: string]: unknown;
 
   constructor(api: API, tokenResponse: Token, audience: string) {
