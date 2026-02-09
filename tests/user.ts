@@ -27,10 +27,35 @@ class MockTextDecoder {
   }
 }
 
+// Minimal EventTarget for storage event tests
+const eventListeners: Record<string, Array<(event: unknown) => void>> = {};
+
+// StorageEvent polyfill for Node
+class MockStorageEvent {
+  type: string;
+  key: string | null;
+  newValue: string | null;
+  constructor(type: string, init?: { key?: string; newValue?: string | null }) {
+    this.type = type;
+    this.key = init?.key ?? null;
+    this.newValue = init?.newValue ?? null;
+  }
+}
+global.StorageEvent = MockStorageEvent as unknown as typeof StorageEvent;
+
 global.window = {
   atob: (base64: string) => Buffer.from(base64, 'base64').toString('binary'),
   localStorage: localStorageMock,
   TextDecoder: MockTextDecoder,
+  addEventListener: vi.fn((type: string, handler: (event: unknown) => void) => {
+    eventListeners[type] = eventListeners[type] || [];
+    eventListeners[type].push(handler);
+  }),
+  dispatchEvent: vi.fn((event: { type: string }) => {
+    const handlers = eventListeners[event.type] || [];
+    handlers.forEach((handler) => handler(event));
+    return true;
+  }),
 } as unknown as Window & typeof globalThis;
 
 global.localStorage = localStorageMock as unknown as Storage;
@@ -302,6 +327,72 @@ test('logout should clear session even if API call fails', async () => {
   // Session should still be cleared despite error
   expect(user.token).toBeNull();
   expect(localStorageMock.removeItem).toHaveBeenCalledWith('gotrue.user');
+});
+
+// Cross-tab sync tests
+test('storage event should clear currentUser when session is removed in another tab', () => {
+  const token = createValidToken(Date.now() / 1000 + 3600);
+  const user = new User(mockApi, token, '');
+  user._saveSession();
+
+  // Verify currentUser is set
+  expect(User.recoverSession(mockApi)).toBe(user);
+
+  // Simulate another tab clearing localStorage (storage event only fires in other tabs)
+  const event = new StorageEvent('storage', {
+    key: 'gotrue.user',
+    newValue: null,
+  });
+  window.dispatchEvent(event);
+
+  // currentUser should be cleared, recoverSession should read from (now-empty) localStorage
+  localStorageMock.removeItem('gotrue.user');
+  expect(User.recoverSession(mockApi)).toBeNull();
+});
+
+test('storage event should clear currentUser when session is updated in another tab', () => {
+  const token = createValidToken(Date.now() / 1000 + 3600);
+  const user = new User(mockApi, token, '');
+  user.id = 'user-123';
+  user.email = 'old@example.com';
+  user._saveSession();
+
+  // Simulate another tab updating the session (e.g. token refresh)
+  const newToken = createValidToken(Date.now() / 1000 + 7200);
+  const newSessionData = JSON.stringify({
+    url: 'https://example.com/.netlify/identity',
+    token: newToken,
+    audience: '',
+    id: 'user-123',
+    email: 'old@example.com',
+  });
+
+  localStorageMock.store['gotrue.user'] = newSessionData;
+  const event = new StorageEvent('storage', {
+    key: 'gotrue.user',
+    newValue: newSessionData,
+  });
+  window.dispatchEvent(event);
+
+  // recoverSession should reconstruct from the updated localStorage data
+  const recovered = User.recoverSession(mockApi);
+  expect(recovered).not.toBe(user); // Should be a new instance, not the stale one
+  expect(recovered).not.toBeNull();
+  expect(recovered!.id).toBe('user-123');
+});
+
+test('storage event for unrelated keys should not affect currentUser', () => {
+  const token = createValidToken(Date.now() / 1000 + 3600);
+  const user = new User(mockApi, token, '');
+
+  const event = new StorageEvent('storage', {
+    key: 'some-other-key',
+    newValue: null,
+  });
+  window.dispatchEvent(event);
+
+  // currentUser should still be the same instance
+  expect(User.recoverSession(mockApi)).toBe(user);
 });
 
 // Update tests

@@ -36,6 +36,7 @@ global.window = {
   atob: (base64: string) => Buffer.from(base64, 'base64').toString('binary'),
   localStorage: localStorageMock,
   TextDecoder: MockTextDecoder,
+  addEventListener: vi.fn(),
 } as unknown as Window & typeof globalThis;
 
 global.localStorage = localStorageMock as unknown as Storage;

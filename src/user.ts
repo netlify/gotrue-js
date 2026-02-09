@@ -17,6 +17,22 @@ const forbiddenUpdateAttributes: Record<string, number> = { api: 1, token: 1, au
 const forbiddenSaveAttributes: Record<string, number> = { api: 1 };
 const isBrowser = (): boolean => typeof window !== 'undefined';
 
+// Lazily register a storage listener to sync currentUser across tabs.
+// The `storage` event only fires in *other* tabs, so when one tab logs out
+// (clearing the session), other tabs will null their in-memory currentUser.
+// The next call to recoverSession() will then read fresh from localStorage.
+let storageListenerActive = false;
+function ensureStorageListener(): void {
+  if (!storageListenerActive && isBrowser()) {
+    storageListenerActive = true;
+    window.addEventListener('storage', (event) => {
+      if (event.key === storageKey) {
+        currentUser = null;
+      }
+    });
+  }
+}
+
 export default class User {
   api: API;
   url: string;
@@ -42,6 +58,7 @@ export default class User {
     this.audience = audience;
     this._processTokenResponse(tokenResponse);
     currentUser = this;
+    ensureStorageListener();
   }
 
   static removeSavedSession(): void {
@@ -49,6 +66,7 @@ export default class User {
   }
 
   static recoverSession(apiInstance?: API): User | null {
+    ensureStorageListener();
     if (currentUser) {
       return currentUser;
     }
