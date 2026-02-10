@@ -152,6 +152,19 @@ export default class GoTrue {
     return user;
   }
 
+  async validateCurrentSession(): Promise<User | null> {
+    const user = this.currentUser();
+    if (!user) {
+      return null;
+    }
+    try {
+      return await user.getUserData();
+    } catch {
+      user.clearSession();
+      return null;
+    }
+  }
+
   verify(type: string, token: string, remember?: boolean): Promise<User> {
     this._setRememberHeaders(remember);
     return this._request<Token>('/verify', {
