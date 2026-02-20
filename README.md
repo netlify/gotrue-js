@@ -37,6 +37,33 @@ setCookie(optional): set to `false` by default. When set to `true`, the library 
 
 **Remember me:** The `login()`, `confirm()`, and `recover()` methods accept an optional `remember` boolean parameter. When `remember` is `true` and `setCookie` is enabled, the server sets longer-lived session cookies. When `false`, the cookies expire when the browser session ends.
 
+### Server settings
+
+Fetch the server's identity settings to check configuration like autoconfirm, signup status, and enabled external providers.
+
+`auth.settings()`
+
+```js
+auth.settings().then((settings) => console.log(settings));
+```
+
+Example response object:
+
+```json
+{
+  "autoconfirm": false,
+  "disable_signup": false,
+  "external": {
+    "bitbucket": true,
+    "email": true,
+    "facebook": false,
+    "github": true,
+    "gitlab": true,
+    "google": true
+  }
+}
+```
+
 ### Error handling
 
 If an error occurs during the request, the promise may be rejected with an `Error`, `HTTPError`, `TextHTTPError`, or `JSONHTTPError`. These error classes are exported from the library and can be used for type checking:
@@ -349,6 +376,23 @@ Example response object:
 }
 ```
 
+### Validate current session
+
+This method validates the cached user against the server. Returns `Promise<User | null>`. If the user's account has been deleted or the session is invalid, it clears the local session and returns `null`.
+
+`auth.validateCurrentSession()`
+
+Use this for server-side rendering or when you need to confirm the local session is still valid before trusting it.
+
+```js
+const user = await auth.validateCurrentSession();
+if (user) {
+  console.log('Session is valid', user);
+} else {
+  console.log('No valid session');
+}
+```
+
 ### Update a user
 
 This function updates a user object with specified attributes
@@ -480,11 +524,33 @@ user
 
 ## Admin methods
 
-The following admin methods are currently not available to be used directly. You can access `context.clientContext.identity` and get a short lived admin token through a Lambda function and achieve the same goals, e.g., update user role, create or delete user etc. See [Functions and Identity](https://docs.netlify.com/functions/functions-and-identity/) for more info.
+Admin methods require a logged-in user with an admin role. You can call them directly via the `user.admin` accessor:
+
+```js
+const user = auth.currentUser();
+const admin = user.admin;
+
+// List all users
+const { users } = await admin.listUsers(aud);
+
+// Get a specific user
+const userData = await admin.getUser({ id: 'user-id' });
+
+// Create a user
+const newUser = await admin.createUser('email@example.com', 'password', { confirm: true });
+
+// Update a user (e.g., set roles)
+await admin.updateUser({ id: 'user-id' }, { app_metadata: { roles: ['editor'] } });
+
+// Delete a user
+await admin.deleteUser({ id: 'user-id' });
+```
+
+Alternatively, you can perform admin operations server-side through a Lambda function using `context.clientContext.identity` to get a short-lived admin token. See [Functions and Identity](https://docs.netlify.com/functions/functions-and-identity/) for more info.
 
 > For users of [Netlify CLI](https://github.com/netlify/cli) - functions using admin methods will _not_ work locally - they need to be deployed to your site in order to work as intended.
 
-Let's create a simple login form in HTML and JavaScript to interact with a lambda function and test out the admin methods.
+Below are examples of calling the admin API from a Lambda function using `fetch`.
 
 1. Create an HTML form for user login
 
@@ -920,6 +986,33 @@ Example response object:
 Currently we support Google, GitHub, GitLab, and BitBucket as directly supported in the Netlify app UI (other oauth providers require serverless functions to be set up correctly, but these don't.)
 
 [`acceptInviteExternalUrl`](https://github.com/netlify/gotrue-js/blob/6dda47191dac9194658c5899272fc962d96f8cd6/index.d.ts#L21) and [`loginExternalUrl`](https://github.com/netlify/gotrue-js/blob/6dda47191dac9194658c5899272fc962d96f8cd6/index.d.ts#L26) are useful for that. You can see example usage in [`netlify-identity-widget`](https://github.com/netlify/netlify-identity-widget/blob/ece08ed2a3653adcad87cf3998277362e362da60/src/state/store.js#L99-L119)
+
+## Exports
+
+The library exports the following:
+
+**Default export:**
+
+- `GoTrue` — the main client class
+
+**Named exports:**
+
+- `User` — user instance class
+- `Admin` — admin API class (accessed via `user.admin`)
+- `HTTPError`, `JSONHTTPError`, `TextHTTPError` — error classes for response handling
+
+**TypeScript types:**
+
+- `Token` — access/refresh token shape
+- `UserData` — server user data shape
+- `UserAttributes` — attributes for user updates
+- `GoTrueInit` — constructor options (`APIUrl`, `audience`, `setCookie`)
+- `Settings` — server settings shape (from `auth.settings()`)
+- `SignupResponse` — response from `auth.signup()`
+
+```js
+import GoTrue, { User, Admin, HTTPError, JSONHTTPError, TextHTTPError } from 'gotrue-js';
+```
 
 ## See also
 
