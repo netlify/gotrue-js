@@ -531,7 +531,7 @@ const user = auth.currentUser();
 const admin = user.admin;
 
 // List all users
-const { users } = await admin.listUsers(aud);
+const users = await admin.listUsers(aud);
 
 // Get a specific user
 const userData = await admin.getUser({ id: 'user-id' });
@@ -548,7 +548,7 @@ await admin.deleteUser({ id: 'user-id' });
 
 Alternatively, you can perform admin operations server-side through a Lambda function using `context.clientContext.identity` to get a short-lived admin token. See [Functions and Identity](https://docs.netlify.com/functions/functions-and-identity/) for more info.
 
-> For users of [Netlify CLI](https://github.com/netlify/cli) - functions using admin methods will _not_ work locally - they need to be deployed to your site in order to work as intended.
+> For users of [Netlify CLI](https://github.com/netlify/cli) - functions using admin methods will _not_ work locally - they need to be deployed to your site to work as intended.
 
 Below are examples of calling the admin API from a Lambda function using `fetch`.
 
