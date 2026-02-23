@@ -11,6 +11,7 @@ export interface GoTrueInit {
   APIUrl?: string;
   audience?: string;
   setCookie?: boolean;
+  clientName?: string;
 }
 
 export interface Settings {
@@ -42,7 +43,7 @@ export default class GoTrue {
   setCookie: boolean;
   api: API;
 
-  constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false }: GoTrueInit = {}) {
+  constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false, clientName = 'gotrue-js' }: GoTrueInit = {}) {
     if (HTTPRegexp.test(APIUrl)) {
       console.warn(
         'Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.',
@@ -54,7 +55,7 @@ export default class GoTrue {
     }
 
     this.setCookie = setCookie;
-    this.api = new API(APIUrl);
+    this.api = new API(APIUrl, { defaultHeaders: { 'X-Nf-Client': clientName } });
   }
 
   async _request<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
