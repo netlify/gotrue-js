@@ -43,7 +43,12 @@ export default class GoTrue {
   setCookie: boolean;
   api: API;
 
-  constructor({ APIUrl = defaultApiURL, audience = '', setCookie = false, clientName = 'gotrue-js' }: GoTrueInit = {}) {
+  constructor({
+    APIUrl = defaultApiURL,
+    audience = '',
+    setCookie = false,
+    clientName = 'gotrue-js',
+  }: GoTrueInit = {}) {
     if (HTTPRegexp.test(APIUrl)) {
       console.warn(
         'Warning:\n\nDO NOT USE HTTP IN PRODUCTION FOR GOTRUE EVER!\nGoTrue REQUIRES HTTPS to work securely.',
