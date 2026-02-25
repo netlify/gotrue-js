@@ -31,22 +31,37 @@
     "netlify"
   ],
   "license": "MIT",
+  "type": "module",
   "files": [
     "src/",
     "lib/",
     "browser/"
   ],
-  "main": "lib/index.js",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
   "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./lib/index.d.ts",
+        "default": "./lib/index.cjs"
+      },
+      "import": {
+        "types": "./lib/index.d.ts",
+        "default": "./lib/index.js"
+      }
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/netlify/gotrue-js.git"
   },
   "scripts": {
     "build:browser": "esbuild src/index.ts --bundle --minify --format=iife --global-name=GoTrue --outfile=browser/gotrue.js",
-    "build:lib": "esbuild src/index.ts src/user.ts src/admin.ts src/api.ts --format=cjs --outdir=lib",
+    "build:lib": "esbuild src/index.ts --bundle --format=cjs --outfile=lib/index.cjs",
+    "build:esm": "esbuild src/index.ts --bundle --format=esm --outfile=lib/index.js",
     "build:types": "tsc --emitDeclarationOnly",
-    "build": "npm run build:browser && npm run build:lib && npm run build:types",
+    "build": "npm run build:browser && npm run build:lib && npm run build:esm && npm run build:types",
     "typecheck": "tsc --noEmit",
     "prepare": "husky && npm run build",
     "test": "run-s lint prettier:check test:dev",
