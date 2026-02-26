@@ -4,6 +4,13 @@
 
 - **docs-readme:** add note about using admin methods with Netlify CLI ([#234](https://github.com/netlify/gotrue-js/issues/234)) ([5f3d504](https://github.com/netlify/gotrue-js/commit/5f3d504b3694610d56027bf40ef7fbf2f1f37eaa))
 
+## [1.0.1](https://github.com/netlify/gotrue-js/compare/v1.0.0...v1.0.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* declare stricter types for the user class ([#914](https://github.com/netlify/gotrue-js/issues/914)) ([5c24c7a](https://github.com/netlify/gotrue-js/commit/5c24c7a9d10e1051924f962304341d1abcca68a9))
+
 ## 1.0.0 (2026-02-26)
 
 
