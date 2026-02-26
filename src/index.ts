@@ -1,7 +1,7 @@
 import API, { JSONHTTPError, type RequestOptions } from './api';
 import User, { type Token } from './user';
 
-export type { Token } from './user';
+export type { Token, AppMetadata } from './user';
 export type { UserData, UserAttributes } from './admin';
 export { default as User } from './user';
 export { default as Admin } from './admin';

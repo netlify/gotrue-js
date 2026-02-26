@@ -33,6 +33,12 @@ function ensureStorageListener(): void {
   }
 }
 
+export interface AppMetadata {
+  provider: string;
+  roles?: string[];
+  [key: string]: unknown;
+}
+
 export default class User {
   api: API;
   url: string;
@@ -45,11 +51,11 @@ export default class User {
   aud!: string;
   email!: string;
   role!: string;
-  app_metadata!: Record<string, unknown>;
+  app_metadata!: AppMetadata;
   user_metadata!: Record<string, unknown>;
   created_at!: string;
   updated_at!: string;
-  confirmed_at!: string;
+  confirmed_at!: string | null;
   new_email?: string;
   [key: string]: unknown;
 

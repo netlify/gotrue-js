@@ -1,15 +1,16 @@
 import type User from './user';
+import type { AppMetadata } from './user';
 
 export interface UserData {
   id: string;
   aud: string;
   email: string;
   role: string;
-  app_metadata: Record<string, unknown>;
+  app_metadata: AppMetadata;
   user_metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
-  confirmed_at: string;
+  confirmed_at: string | null;
   [key: string]: unknown;
 }
 
