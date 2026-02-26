@@ -20,16 +20,8 @@
 
 ### Bug Fixes
 
-* add changelog to prettier ignore ([#901](https://github.com/netlify/gotrue-js/issues/901)) ([0bcf5d7](https://github.com/netlify/gotrue-js/commit/0bcf5d7c0234bce62c1d90b86fe4be83f1f28593))
 * add more tests and fix bugs ([#893](https://github.com/netlify/gotrue-js/issues/893)) ([795e2ac](https://github.com/netlify/gotrue-js/commit/795e2ac3f635c444f7e6e8772ed75eb07cda4360))
 * cross-tab logout sync ([#900](https://github.com/netlify/gotrue-js/issues/900)) ([9d56ecd](https://github.com/netlify/gotrue-js/commit/9d56ecdb6613d213e658965541ea769a816ecd95))
-* husky binary not found ([c8f42b9](https://github.com/netlify/gotrue-js/commit/c8f42b922c2c899abc55a603bb2c8eadd9af6db1))
-* husky binary not found ([0fdf7e8](https://github.com/netlify/gotrue-js/commit/0fdf7e810e3a5a54d36cc830b219f41cee5748fd))
-* skip prepare script during prerelease install ([#904](https://github.com/netlify/gotrue-js/issues/904)) ([bdade18](https://github.com/netlify/gotrue-js/commit/bdade182d2fd15a2072f581e16494da01643bda7))
-* update eslint dependencies ([#894](https://github.com/netlify/gotrue-js/issues/894)) ([d783d08](https://github.com/netlify/gotrue-js/commit/d783d088bcf47601fdd718e136699633f462d778))
-* update github actions and clean them ([#895](https://github.com/netlify/gotrue-js/issues/895)) ([50c9fb5](https://github.com/netlify/gotrue-js/commit/50c9fb549cc3c056f733c1b847868111a56264a5))
-* update github workflows to node 20 ([77546c4](https://github.com/netlify/gotrue-js/commit/77546c4da06e886325916d5747839f048928bfc7))
-* update github workflows to node 20 ([6ec338c](https://github.com/netlify/gotrue-js/commit/6ec338ca141676ce389404a8052cbcf19285e8e9))
 
 ### [0.9.29](https://www.github.com/netlify/gotrue-js/compare/v0.9.28...v0.9.29) (2021-01-28)
 
