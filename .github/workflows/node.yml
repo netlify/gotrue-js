@@ -42,7 +42,7 @@ jobs:
           echo "os=${os/-latest/}" >> $GITHUB_OUTPUT
           echo "node=node_${node//[.*]/}" >> $GITHUB_OUTPUT
         shell: bash
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         with:
           files: coverage/coverage-final.json
           flags: ${{ steps.test-coverage-flags.outputs.os }},${{ steps.test-coverage-flags.outputs.node }}
